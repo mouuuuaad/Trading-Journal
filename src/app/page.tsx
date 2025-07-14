@@ -33,7 +33,7 @@ export default function LoginPage() {
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
-      router.push('/dashboard');
+      // AuthProvider will handle the redirect
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -47,7 +47,7 @@ export default function LoginPage() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      // AuthProvider will handle the redirect
     } catch (error: any) {
       toast({
         title: "Google Sign-In Failed",

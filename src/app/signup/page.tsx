@@ -33,7 +33,7 @@ export default function SignupPage() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
       await updateProfile(userCredential.user, { displayName: data.name });
-      router.push('/dashboard');
+      // AuthProvider will handle the redirect
     } catch (error: any) {
       toast({
         title: "Signup Failed",
@@ -47,7 +47,7 @@ export default function SignupPage() {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      router.push('/dashboard');
+      // AuthProvider will handle the redirect
     } catch (error: any) {
       toast({
         title: "Google Sign-In Failed",

@@ -7,6 +7,7 @@ import { auth } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 
 const publicRoutes = ['/', '/signup'];
+const privateRoutePrefix = '/dashboard';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, loading] = useAuthState(auth);
@@ -14,14 +15,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading) {
-      const isPublicRoute = publicRoutes.includes(pathname);
-      if (!user && !isPublicRoute) {
-        router.push('/');
-      }
-      if (user && isPublicRoute) {
-        router.push('/dashboard');
-      }
+    if (loading) {
+      return; // Wait for authentication state to load
+    }
+
+    const isPublicRoute = publicRoutes.includes(pathname);
+    const isPrivateRoute = pathname.startsWith(privateRoutePrefix);
+
+    if (user && isPublicRoute) {
+      // User is logged in but on a public route, redirect to dashboard
+      router.push('/dashboard');
+    } else if (!user && isPrivateRoute) {
+      // User is not logged in but on a private route, redirect to login
+      router.push('/');
     }
   }, [user, loading, router, pathname]);
 
@@ -32,14 +38,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  
+
+  // Prevent rendering children until redirect has a chance to happen
   const isPublicRoute = publicRoutes.includes(pathname);
-
-  if (!user && !isPublicRoute) {
-    return null; 
-  }
-
   if (user && isPublicRoute) {
+    return null;
+  }
+  if (!user && !isPublicRoute) {
     return null;
   }
 
