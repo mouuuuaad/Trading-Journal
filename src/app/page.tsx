@@ -17,11 +17,13 @@ export default function LandingPage() {
   const finalCtaRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    gsap.set(containerRef.current, { opacity: 1 }); // Ensure container is visible
+    // Ensure container is visible before starting animations
+    gsap.set(containerRef.current, { opacity: 1 }); 
 
     const tl = gsap.timeline({
       delay: 0.5,
       onComplete: () => {
+        // Final fade out of the entire scene before redirecting
         gsap.to(containerRef.current, {
           opacity: 0,
           duration: 1,
@@ -33,24 +35,24 @@ export default function LandingPage() {
       },
     });
 
-    // Initial Intro
+    // 1. Initial Intro Animation in the center
     tl.fromTo(
       [iconRef.current, titleRef.current],
       { y: 0, scale: 0, opacity: 0, rotation: -90 },
       { y: 0, scale: 1, opacity: 1, rotation: 0, duration: 1.2, ease: 'power3.out', stagger: 0.2 }
     );
 
-    // Subtitle appears
+    // 2. Subtitle appears below the title
     tl.fromTo(
         subtitleRef.current,
         { y: 20, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' },
-        "-=0.5"
+        "-=0.5" // Overlap with previous animation for smoother transition
       );
 
-    tl.to({}, { duration: 1 }); // Pause
+    tl.to({}, { duration: 1 }); // Pause to let the user read
 
-    // Move intro elements to new positions
+    // 3. Main elements move to new positions (top and bottom)
     tl.to([iconRef.current, titleRef.current], {
       y: () => -(containerRef.current!.clientHeight / 2 - 80), // Move to top
       scale: 0.6,
@@ -63,10 +65,10 @@ export default function LandingPage() {
       scale: 0.8,
       duration: 1.5,
       ease: 'power2.inOut',
-    }, "<");
+    }, "<"); // The "<" ensures this animation runs at the same time as the one above
 
 
-    // Unfold features from the sides
+    // 4. Unfold feature list from alternating sides
     tl.fromTo(
       featuresRef.current,
       { opacity: 0, x: (index) => (index % 2 === 0 ? -100 : 100) },
@@ -77,26 +79,26 @@ export default function LandingPage() {
         ease: 'power3.out',
         stagger: 0.3
       },
-      "-=1"
+      "-=1" // Overlap for a smooth flow
     );
 
     tl.to({}, { duration: 1.5 }); // Another pause
 
-    // Fade out features and subtitle
+    // 5. Fade out features and subtitle to clear the stage
     tl.to([featuresRef.current, subtitleRef.current], {
         opacity: 0,
         duration: 0.7,
         ease: 'power2.in'
     });
 
-    // Final CTA appears in the center
+    // 6. Final CTA appears in the center
     tl.fromTo(
         finalCtaRef.current,
         { opacity: 0, scale: 0.8 },
         { opacity: 1, scale: 1, duration: 1, ease: 'power3.out'}
     );
 
-    tl.to({}, { duration: 2 }); // Final hold before fadeout
+    tl.to({}, { duration: 2 }); // Final hold before the main fadeout begins
 
   }, [router]);
 
@@ -105,7 +107,7 @@ export default function LandingPage() {
       ref={containerRef}
       className="flex min-h-screen w-full flex-col items-center justify-center bg-background text-center overflow-hidden p-4 opacity-0"
     >
-        {/* All animated elements are absolutely positioned for full control */}
+        {/* All animated elements are absolutely positioned for full layout control by GSAP */}
         <div className="absolute flex flex-col items-center gap-2">
             <TradeVisionIcon ref={iconRef} className="h-24 w-24 opacity-0" />
             <h1
