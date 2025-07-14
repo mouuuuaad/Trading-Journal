@@ -4,7 +4,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, query, where, orderBy } from "firebase/firestore";
+import { collection, query, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
@@ -132,7 +132,8 @@ export default function DashboardPage() {
 
   const tradesQuery = useMemo(() => {
     if (user) {
-      return query(collection(db, "trades"), where("userId", "==", user.uid), orderBy("date", "desc"));
+      // ** FIX: Remove the orderBy clause to avoid needing a composite index **
+      return query(collection(db, "trades"), where("userId", "==", user.uid));
     }
     return null;
   }, [user]);
@@ -150,6 +151,8 @@ export default function DashboardPage() {
             date: data.date.toDate ? data.date.toDate() : new Date(data.date),
         } as Trade;
       });
+      // ** FIX: Sort the data here in the client-side code **
+      tradesData.sort((a, b) => b.date.getTime() - a.date.getTime());
       setAllTrades(tradesData);
     } else {
       setAllTrades([]);
