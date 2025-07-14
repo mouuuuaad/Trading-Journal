@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib/firebase';
-import { CircleNotch } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 const publicRoutes = ['/', '/signup'];
 
@@ -28,16 +28,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
-        <CircleNotch className="h-12 w-12 animate-spin text-primary" />
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
   
-  if (!user && !publicRoutes.includes(pathname)) {
+  const isPublicRoute = publicRoutes.includes(pathname);
+
+  if (!user && !isPublicRoute) {
     return null; 
   }
 
-  if (user && publicRoutes.includes(pathname)) {
+  if (user && isPublicRoute) {
     return null;
   }
 
