@@ -10,6 +10,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -24,9 +26,20 @@ type StatsCardsProps = {
   winningTrades: number;
   totalTrades: number;
   rrRatio: number;
+  dateRange: string;
+  setDateRange: (range: "all" | "today" | "this-week" | "this-month" | "this-year") => void;
 };
 
-export function StatsCards({ totalPnl, winRate, winningTrades, totalTrades, rrRatio }: StatsCardsProps) {
+const dateRangeOptions = [
+    { value: "all", label: "All Time" },
+    { value: "today", label: "Today" },
+    { value: "this-week", label: "This Week" },
+    { value: "this-month", label: "This Month" },
+    { value: "this-year", label: "This Year" },
+];
+
+export function StatsCards({ totalPnl, winRate, winningTrades, totalTrades, rrRatio, dateRange, setDateRange }: StatsCardsProps) {
+  const selectedLabel = dateRangeOptions.find(opt => opt.value === dateRange)?.label || "All Time";
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
@@ -74,18 +87,20 @@ export function StatsCards({ totalPnl, winRate, winningTrades, totalTrades, rrRa
         <CardContent>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full">
-                All Time
+              <Button variant="outline" className="w-full justify-start">
+                <span>{selectedLabel}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Filter by</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Today</DropdownMenuItem>
-              <DropdownMenuItem>This Week</DropdownMenuItem>
-              <DropdownMenuItem>This Month</DropdownMenuItem>
-              <DropdownMenuItem>This Year</DropdownMenuItem>
-               <DropdownMenuItem>All Time</DropdownMenuItem>
+              <DropdownMenuRadioGroup value={dateRange} onValueChange={(value) => setDateRange(value as any)}>
+                 {dateRangeOptions.map((option) => (
+                    <DropdownMenuRadioItem key={option.value} value={option.value}>
+                        {option.label}
+                    </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </CardContent>

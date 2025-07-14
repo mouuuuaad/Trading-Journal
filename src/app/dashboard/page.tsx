@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -11,6 +12,44 @@ import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { WinLossChart } from "@/components/dashboard/win-loss-chart";
 import { TradeTable } from "@/components/dashboard/trade-table";
 import { Trade } from "@/lib/types";
+import {
+  startOfToday,
+  startOfWeek,
+  startOfMonth,
+  startOfYear,
+  parseISO,
+} from 'date-fns';
+
+type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
+
+function filterTradesByDateRange(trades: Trade[], range: DateRange): Trade[] {
+  const now = new Date();
+  let startDate: Date;
+
+  switch (range) {
+    case 'today':
+      startDate = startOfToday();
+      break;
+    case 'this-week':
+      startDate = startOfWeek(now);
+      break;
+    case 'this-month':
+      startDate = startOfMonth(now);
+      break;
+    case 'this-year':
+      startDate = startOfYear(now);
+      break;
+    case 'all':
+    default:
+      return trades;
+  }
+
+  return trades.filter(trade => {
+    const tradeDate = parseISO(trade.date);
+    return tradeDate >= startDate;
+  });
+}
+
 
 function calculateStats(trades: Trade[]) {
   if (!trades || trades.length === 0) {
@@ -82,7 +121,8 @@ function calculateStats(trades: Trade[]) {
 
 export default function DashboardPage() {
   const [user] = useAuthState(auth);
-  const [trades, setTrades] = useState<Trade[]>([]);
+  const [allTrades, setAllTrades] = useState<Trade[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange>("all");
 
   const tradesQuery = useMemo(() => {
     if (user) {
@@ -99,24 +139,28 @@ export default function DashboardPage() {
         id: doc.id,
         ...doc.data()
       } as Trade));
-      setTrades(tradesData);
+      setAllTrades(tradesData);
     } else {
-      setTrades([]);
+      setAllTrades([]);
     }
   }, [tradesSnapshot]);
   
-  const stats = calculateStats(trades);
+  const filteredTrades = useMemo(() => filterTradesByDateRange(allTrades, dateRange), [allTrades, dateRange]);
+  const stats = useMemo(() => calculateStats(filteredTrades), [filteredTrades]);
+  const allTimeStats = useMemo(() => calculateStats(allTrades), [allTrades]);
 
   return (
     <>
       <Header />
-      <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8">
+      <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
         <StatsCards 
           totalPnl={stats.totalPnl}
           winRate={stats.winRate}
           winningTrades={stats.winningTrades}
           totalTrades={stats.totalTrades}
           rrRatio={stats.rrRatio}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
         />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
           <div className="lg:col-span-4">
@@ -126,7 +170,7 @@ export default function DashboardPage() {
             <WinLossChart data={stats.winLossData} />
           </div>
         </div>
-        <TradeTable trades={trades} />
+        <TradeTable trades={filteredTrades} />
       </main>
     </>
   );
