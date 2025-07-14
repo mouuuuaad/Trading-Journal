@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, query, where } from "firebase/firestore";
+import { collection, query, where, orderBy } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
@@ -22,7 +22,7 @@ function calculateStats(trades: Trade[]) {
       rrRatio: 0,
       performanceData: [],
       winLossData: [
-        { name: 'Wins', value: 0, fill: "hsl(var(--accent))" },
+        { name: 'Wins', value: 0, fill: "hsl(var(--chart-2))" },
         { name: 'Losses', value: 0, fill: "hsl(var(--destructive))" },
         { name: 'Break Even', value: 0, fill: "hsl(var(--muted-foreground))" },
       ],
@@ -37,26 +37,21 @@ function calculateStats(trades: Trade[]) {
 
   const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
   
-  const totalReward = trades.reduce((acc, trade) => {
-    if (trade.direction === 'Buy') {
-      return acc + (trade.takeProfit - trade.entryPrice);
-    } else {
-      return acc + (trade.entryPrice - trade.takeProfit);
-    }
+  const totalReward = trades.filter(t => t.result === 'Win').reduce((acc, trade) => {
+      const reward = Math.abs(trade.takeProfit - trade.entryPrice);
+      return acc + reward;
   }, 0);
 
-  const totalRisk = trades.reduce((acc, trade) => {
-    if (trade.direction === 'Buy') {
-      return acc + (trade.entryPrice - trade.stopLoss);
-    } else {
-      return acc + (trade.stopLoss - trade.entryPrice);
-    }
+  const totalRisk = trades.filter(t => t.result === 'Loss').reduce((acc, trade) => {
+      const risk = Math.abs(trade.entryPrice - trade.stopLoss);
+      return acc + risk;
   }, 0);
+  
+  const averageReward = winningTrades > 0 ? totalReward / winningTrades : 0;
+  const averageRisk = losingTrades > 0 ? totalRisk / losingTrades : 0;
+  
+  const rrRatio = averageRisk > 0 ? averageReward / averageRisk : 0;
 
-  const averageRisk = totalTrades > 0 ? totalRisk / totalTrades : 0;
-  const averageReward = totalTrades > 0 ? totalReward / totalTrades : 0;
-
-  const rrRatio = averageRisk > 0 ? Math.abs(averageReward / averageRisk) : 0;
 
   const performanceData = trades
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -67,7 +62,7 @@ function calculateStats(trades: Trade[]) {
     }, [] as { date: string; pnl: number }[]);
 
   const winLossData = [
-    { name: 'Wins', value: winningTrades, fill: "hsl(var(--accent))" },
+    { name: 'Wins', value: winningTrades, fill: "hsl(var(--chart-2))" },
     { name: 'Losses', value: losingTrades, fill: "hsl(var(--destructive))" },
     { name: 'Break Even', value: beTrades, fill: "hsl(var(--muted-foreground))" },
   ];
@@ -90,7 +85,7 @@ export default function DashboardPage() {
 
   const tradesQuery = useMemo(() => {
     if (user) {
-      return query(collection(db, "trades"), where("userId", "==", user.uid));
+      return query(collection(db, "trades"), where("userId", "==", user.uid), orderBy("date", "desc"));
     }
     return null;
   }, [user]);
@@ -114,7 +109,7 @@ export default function DashboardPage() {
   return (
     <>
       <Header />
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+      <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8">
         <StatsCards 
           totalPnl={stats.totalPnl}
           winRate={stats.winRate}
@@ -122,7 +117,7 @@ export default function DashboardPage() {
           totalTrades={stats.totalTrades}
           rrRatio={stats.rrRatio}
         />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
           <div className="lg:col-span-4">
             <PerformanceChart data={stats.performanceData} />
           </div>

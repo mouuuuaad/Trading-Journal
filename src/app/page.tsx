@@ -26,7 +26,7 @@ type LoginSchema = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginSchema>({
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -58,7 +58,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen w-full items-center justify-center bg-muted/40 p-4">
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader className="text-center space-y-2">
           <TradeVisionIcon className="mx-auto h-12 w-auto" />
@@ -69,15 +69,17 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" {...register("email")} />
+              <Input id="email" type="email" placeholder="m@example.com" {...register("email")} disabled={isSubmitting} />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register("password")} />
+              <Input id="password" type="password" {...register("password")} disabled={isSubmitting}/>
               {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
             </div>
-            <Button type="submit" className="w-full">Login</Button>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Logging in..." : "Login"}
+            </Button>
           </form>
             <div className="relative mt-4">
               <div className="absolute inset-0 flex items-center">
@@ -89,7 +91,7 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
-            <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn}>
+            <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn} disabled={isSubmitting}>
               Sign in with Google
             </Button>
           <div className="mt-4 text-center text-sm">

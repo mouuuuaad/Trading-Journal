@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { TradeVisionIcon } from "../icons";
 import { AddTradeModal } from "./add-trade-modal";
 import { ExportButton } from "./export-button";
@@ -59,33 +59,32 @@ export function Header() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left">
-          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           <nav className="grid gap-6 text-lg font-medium">
             <Link
-              href="#"
+              href="/dashboard"
               className="flex items-center gap-2 text-lg font-semibold"
             >
               <TradeVisionIcon className="h-6 w-6" />
-              <span className="sr-only">TradeVision</span>
+              <span>TradeVision</span>
             </Link>
-            <Link href="/dashboard" className="hover:text-foreground">
+            <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
               Dashboard
             </Link>
           </nav>
         </SheetContent>
       </Sheet>
-      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+      <div className="flex w-full items-center gap-2 md:ml-auto md:gap-4">
         <div className="ml-auto flex-1 sm:flex-initial">
             <AddTradeModal />
         </div>
         <ExportButton />
-        <Button variant="ghost" size="icon" className="rounded-full">
+        <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
             <Settings className="h-5 w-5" />
             <span className="sr-only">Settings</span>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="rounded-full">
+            <Button variant="secondary" size="icon" className="rounded-full h-9 w-9">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
                 <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
