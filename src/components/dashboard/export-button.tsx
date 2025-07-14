@@ -7,20 +7,8 @@ import { FileDown } from "lucide-react"
 export function ExportButton() {
   const handleExport = () => {
     // This triggers the browser's print dialog, which can be used to save as PDF.
-    const printContents = document.getElementById("dashboard-content")?.innerHTML;
-    const originalContents = document.body.innerHTML;
-
-    if (printContents) {
-      document.body.innerHTML = `<div class="print-container">${printContents}</div>`;
-    }
-    
+    // We now rely on CSS @media print rules to style the output.
     window.print();
-    
-    if (printContents) {
-      document.body.innerHTML = originalContents;
-      // Re-initialize any event listeners if needed after restoring content
-      // This is a simple implementation, complex apps might need a more robust solution
-    }
   }
 
   return (

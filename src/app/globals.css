@@ -73,20 +73,34 @@
   body {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    background: white;
+    color: black;
   }
   header,
-  .no-print {
+  .no-print,
+  nav {
     display: none !important;
   }
   main {
     padding: 0 !important;
     margin: 0 !important;
   }
-  .print-container {
-    padding: 2rem;
+  #dashboard-content {
+    padding: 2rem !important;
+    margin: 0 !important;
   }
   .card {
-    border: 1px solid hsl(var(--border));
-    box-shadow: none;
+    border: 1px solid hsl(var(--border)) !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+  /* Ensure recharts renders correctly */
+  .recharts-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .recharts-surface {
+    width: 100% !important;
+    height: 100% !important;
   }
 }
