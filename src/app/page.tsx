@@ -5,14 +5,14 @@ import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 import { TradeVisionIcon } from '@/components/icons';
-import { cn } from '@/lib/utils';
+import { FilePenLine, PieChart, TrendingUp } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const titleGroupRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
-  const featuresRef = useRef<(HTMLDivElement | null)[]>([]);
+  const featuresRef = useRef<HTMLDivElement>(null);
   const finalCtaRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -54,32 +54,48 @@ export default function LandingPage() {
     // 3. Main elements move to new positions (top and bottom)
     tl.to(titleGroupRef.current, {
       y: () => -(containerRef.current!.clientHeight / 2 - 80), // Move to top
-      scale: 0.6,
+      scale: 0.7,
       duration: 1.5,
       ease: 'power2.inOut',
     });
      tl.to(subtitleRef.current, {
       y: () => (containerRef.current!.clientHeight / 2 - 120), // Move to bottom
       opacity: 0.5,
-      scale: 0.8,
+      scale: 0.9,
       duration: 1.5,
       ease: 'power2.inOut',
     }, "<"); // The "<" ensures this animation runs at the same time as the one above
 
 
-    // 4. Unfold feature list from alternating sides
-    tl.fromTo(
-      featuresRef.current,
-      { opacity: 0, x: (index) => (index % 2 === 0 ? -100 : 100) },
-      {
+    // 4. Animate in the icons and their labels
+    const icons = gsap.utils.toArray('.feature-icon');
+    const labels = gsap.utils.toArray('.feature-label');
+
+    tl.fromTo(icons, {
+        opacity: 0,
+        scale: 0,
+        y: (i) => (i % 2 === 0 ? -100 : 100),
+        x: (i) => (i === 1 ? 0 : (i === 0 ? -150 : 150))
+    }, {
         opacity: 1,
+        scale: 1,
+        y: 0,
         x: 0,
         duration: 1,
         ease: 'power3.out',
-        stagger: 0.3
-      },
-      "-=1" // Overlap for a smooth flow
-    );
+        stagger: 0.2
+    }, "-=1");
+
+    tl.fromTo(labels, {
+        opacity: 0,
+        y: 20,
+    }, {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.2
+    }, "-=0.5");
+
 
     tl.to({}, { duration: 1.5 }); // Another pause
 
@@ -120,18 +136,18 @@ export default function LandingPage() {
             Your Personal Trading Journal, Reimagined.
         </p>
 
-        <div className="absolute flex flex-col gap-8 text-center">
-            <div ref={el => featuresRef.current[0] = el} className="opacity-0">
-                <h3 className="text-xl font-semibold text-primary">Log Every Detail</h3>
-                <p className="text-muted-foreground mt-1">Capture assets, prices, and notes with ease.</p>
+        <div ref={featuresRef} className="absolute flex w-full justify-center items-start gap-12 sm:gap-20">
+            <div className="flex flex-col items-center gap-3">
+                <FilePenLine className="feature-icon h-12 w-12 text-primary opacity-0" />
+                <p className="feature-label text-sm font-medium text-muted-foreground opacity-0">Log</p>
             </div>
-             <div ref={el => featuresRef.current[1] = el} className="opacity-0">
-                <h3 className="text-xl font-semibold text-accent">Analyze Your Performance</h3>
-                <p className="text-muted-foreground mt-1">Track P/L, win rates, and key stats.</p>
+             <div className="flex flex-col items-center gap-3">
+                <PieChart className="feature-icon h-12 w-12 text-accent opacity-0" />
+                <p className="feature-label text-sm font-medium text-muted-foreground opacity-0">Analyze</p>
             </div>
-             <div ref={el => featuresRef.current[2] = el} className="opacity-0">
-                <h3 className="text-xl font-semibold text-primary">Visualize Your Growth</h3>
-                <p className="text-muted-foreground mt-1">Interactive charts show your progress.</p>
+             <div className="flex flex-col items-center gap-3">
+                <TrendingUp className="feature-icon h-12 w-12 text-primary opacity-0" />
+                <p className="feature-label text-sm font-medium text-muted-foreground opacity-0">Visualize</p>
             </div>
         </div>
 
