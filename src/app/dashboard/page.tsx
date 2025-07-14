@@ -54,6 +54,7 @@ function calculateStats(trades: Trade[]) {
 
 
   const performanceData = trades
+    .slice() // Create a shallow copy to avoid mutating the original array
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .reduce((acc, trade, index) => {
       const cumulativePnl = (acc[index - 1]?.pnl || 0) + (trade.pnl || 0);

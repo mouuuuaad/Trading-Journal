@@ -1,6 +1,7 @@
 import { AuthProvider } from "@/components/auth-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { Header } from "@/components/dashboard/header";
 
 export default function DashboardLayout({
   children,
