@@ -90,9 +90,9 @@ export default function GuestPage() {
             </Button>
         </CardContent>
        </Card>
-        <Link href="/login" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+        <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
             <TradeVisionIcon className="h-5 w-5" />
-            <span>Powered by TradeVision</span>
+            <span>Created by Mouaad Idoufkir</span>
         </Link>
     </div>
   );

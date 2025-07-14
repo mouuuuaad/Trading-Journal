@@ -59,7 +59,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-muted/40 p-4">
+    <div className="flex min-h-screen w-full flex-col items-center justify-center bg-muted/40 p-4">
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader className="text-center space-y-2">
           <TradeVisionIcon className="mx-auto h-12 w-auto" />
@@ -103,6 +103,10 @@ export default function LoginPage() {
           </div>
         </CardContent>
       </Card>
+      <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+          <TradeVisionIcon className="h-5 w-5" />
+          <span>Created by Mouaad Idoufkir</span>
+      </Link>
     </div>
   );
 }
