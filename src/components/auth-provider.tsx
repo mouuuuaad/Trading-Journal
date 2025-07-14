@@ -5,8 +5,9 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
+import { authorizedUsers } from '@/lib/config';
 
-const publicRoutes = ['/', '/signup'];
+const publicRoutes = ['/', '/signup', '/guest'];
 const privateRoutePrefix = '/dashboard';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -21,14 +22,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const isPublicRoute = publicRoutes.includes(pathname);
     const isPrivateRoute = pathname.startsWith(privateRoutePrefix);
+    const isAuthorized = user && authorizedUsers.includes(user.email || "");
 
-    if (user && isPublicRoute) {
-      // User is logged in but on a public route, redirect to dashboard
-      router.push('/dashboard');
-    } else if (!user && isPrivateRoute) {
-      // User is not logged in but on a private route, redirect to login
-      router.push('/');
+    if (user) {
+      if (isAuthorized) {
+        if (isPublicRoute && pathname !== '/guest') {
+           // Authorized user on a public page (like login), send to their dashboard
+           router.push('/dashboard');
+        }
+      } else {
+        // User is logged in but NOT authorized
+        if (pathname !== '/guest') {
+          // Send them to the guest page
+          router.push('/guest');
+        }
+      }
+    } else {
+       // User is not logged in
+       if (isPrivateRoute) {
+         // Trying to access a private route without being logged in, send to login
+         router.push('/');
+       }
     }
+
   }, [user, loading, router, pathname]);
 
   if (loading) {
@@ -40,13 +56,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Prevent rendering children until redirect has a chance to happen
-  const isPublicRoute = publicRoutes.includes(pathname);
-  if (user && isPublicRoute) {
+  const isAuthorized = user && authorizedUsers.includes(user.email || "");
+  if (user && publicRoutes.includes(pathname) && isAuthorized && pathname !== '/guest') {
+      return null;
+  }
+   if (user && !isAuthorized && pathname !== '/guest') {
+      return null;
+  }
+  if (!user && !publicRoutes.includes(pathname)) {
     return null;
   }
-  if (!user && !isPublicRoute) {
-    return null;
-  }
+
 
   return <>{children}</>;
 }
