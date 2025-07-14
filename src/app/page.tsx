@@ -10,15 +10,14 @@ import { cn } from '@/lib/utils';
 export default function LandingPage() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  const iconRef = useRef<SVGSVGElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const titleGroupRef = useRef<HTMLDivElement>(null);
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const featuresRef = useRef<(HTMLDivElement | null)[]>([]);
   const finalCtaRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     // Ensure container is visible before starting animations
-    gsap.set(containerRef.current, { opacity: 1 }); 
+    gsap.set(containerRef.current, { opacity: 1 });
 
     const tl = gsap.timeline({
       delay: 0.5,
@@ -37,9 +36,9 @@ export default function LandingPage() {
 
     // 1. Initial Intro Animation in the center
     tl.fromTo(
-      [iconRef.current, titleRef.current],
+      titleGroupRef.current,
       { y: 0, scale: 0, opacity: 0, rotation: -90 },
-      { y: 0, scale: 1, opacity: 1, rotation: 0, duration: 1.2, ease: 'power3.out', stagger: 0.2 }
+      { y: 0, scale: 1, opacity: 1, rotation: 0, duration: 1.2, ease: 'power3.out' }
     );
 
     // 2. Subtitle appears below the title
@@ -53,7 +52,7 @@ export default function LandingPage() {
     tl.to({}, { duration: 1 }); // Pause to let the user read
 
     // 3. Main elements move to new positions (top and bottom)
-    tl.to([iconRef.current, titleRef.current], {
+    tl.to(titleGroupRef.current, {
       y: () => -(containerRef.current!.clientHeight / 2 - 80), // Move to top
       scale: 0.6,
       duration: 1.5,
@@ -108,11 +107,10 @@ export default function LandingPage() {
       className="flex min-h-screen w-full flex-col items-center justify-center bg-background text-center overflow-hidden p-4 opacity-0"
     >
         {/* All animated elements are absolutely positioned for full layout control by GSAP */}
-        <div className="absolute flex flex-col items-center gap-2">
-            <TradeVisionIcon ref={iconRef} className="h-24 w-24 opacity-0" />
+        <div ref={titleGroupRef} className="absolute flex flex-col items-center gap-2 opacity-0">
+            <TradeVisionIcon className="h-24 w-24" />
             <h1
-            ref={titleRef}
-            className="font-headline text-5xl sm:text-7xl font-bold tracking-tighter text-foreground opacity-0"
+            className="font-headline text-5xl sm:text-7xl font-bold tracking-tighter text-foreground"
             >
             TradeVision
             </h1>
