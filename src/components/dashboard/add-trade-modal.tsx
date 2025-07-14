@@ -25,15 +25,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+
+const popularAssets = [
+  "EUR/USD", "GBP/USD", "USD/JPY", "USD/CAD", "AUD/USD",
+  "XAU/USD (Gold)", "USO/USD (Oil)", "BTC/USD", "ETH/USD", "SPX500"
+];
+
+const commonNotes = [
+  "Trend Following", "Breakout Strategy", "Range Trading", "Reversal Pattern",
+  "Support/Resistance Bounce", "News Catalyst", "Technical Divergence",
+  "High Volume Confirmation", "Risk Management Adjustment", "Gut Feeling"
+];
 
 
 const tradeSchema = z.object({
@@ -137,10 +147,21 @@ export function AddTradeModal() {
           <div className="grid gap-4 py-4">
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="asset" className="text-right">Asset</Label>
-              <Controller
+               <Controller
                 name="asset"
                 control={control}
-                render={({ field }) => <Input id="asset" placeholder="e.g., EUR/USD" className="col-span-3" {...field} />}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Select an asset" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {popularAssets.map(asset => (
+                        <SelectItem key={asset} value={asset}>{asset}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
                {errors.asset && <p className="col-span-4 text-right text-sm text-destructive">{errors.asset.message}</p>}
             </div>
@@ -231,12 +252,23 @@ export function AddTradeModal() {
                 )}
               />
             </div>
-             <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="notes" className="text-right pt-2">Notes</Label>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="notes" className="text-right">Notes</Label>
               <Controller
                 name="notes"
                 control={control}
-                render={({ field }) => <Textarea id="notes" placeholder="Trade rationale, execution notes, etc." className="col-span-3" {...field} value={field.value ?? ""} />}
+                render={({ field }) => (
+                   <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger className="col-span-3">
+                      <SelectValue placeholder="Select a trade rationale" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {commonNotes.map(note => (
+                        <SelectItem key={note} value={note}>{note}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               />
             </div>
           </div>
