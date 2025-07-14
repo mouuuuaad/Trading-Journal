@@ -69,7 +69,7 @@ export default function LandingPage() {
     // --- ACT II: THE VISION UNFOLDS ---
     // Title moves up, subtitle fades in, features appear
     tl.to(titleGroupRef.current, {
-        y: () => -(containerRef.current!.clientHeight / 2 - 80), // Move to top
+        y: () => -(containerRef.current!.clientHeight / 2) + (titleGroupRef.current!.clientHeight / 2) + 40,
         scale: 0.7,
         duration: 1.5,
         ease: 'power2.inOut',
@@ -126,7 +126,7 @@ export default function LandingPage() {
       className="flex min-h-screen w-full flex-col items-center justify-center bg-background text-center overflow-hidden p-4 opacity-0"
     >
         {/* All animated elements are absolutely positioned for full layout control by GSAP */}
-        <div ref={titleGroupRef} className="absolute flex flex-col items-center gap-2 opacity-0">
+        <div ref={titleGroupRef} className="absolute flex flex-col items-center gap-4 opacity-0">
             <TradeVisionIcon ref={iconRef} className="h-24 w-24" />
             <h1 ref={titleTextRef}
             className="font-headline text-5xl sm:text-7xl font-bold tracking-tighter text-foreground"
@@ -135,11 +135,11 @@ export default function LandingPage() {
             </h1>
         </div>
 
-        <p ref={subtitleRef} className="absolute bottom-24 text-lg text-muted-foreground max-w-md opacity-0">
+        <p ref={subtitleRef} className="absolute text-lg text-muted-foreground max-w-md opacity-0" style={{top: 'calc(50% - 20px)'}}>
             Your Personal Trading Journal, Reimagined.
         </p>
 
-        <div ref={featuresRef} className="absolute flex w-full justify-center items-start gap-12 sm:gap-20">
+        <div ref={featuresRef} className="absolute flex w-full justify-center items-start gap-12 sm:gap-20" style={{top: 'calc(50% + 40px)'}}>
             <div ref={feature1Ref} className="flex flex-col items-center gap-3 opacity-0">
                 <FilePenLine className="h-12 w-12 text-primary" />
                 <p className="text-sm font-medium text-muted-foreground">Log</p>
