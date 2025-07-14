@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,7 @@ export default function GuestPage() {
         <CardHeader>
            <div className="flex justify-center items-center gap-4 mb-4">
              <Avatar className="h-16 w-16">
-                <AvatarImage src={user?.photoURL || ""} alt={user?.displayName || 'User'} />
+                <AvatarImage src={user?.photoURL || undefined} alt={user?.displayName || 'User'} />
                 <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
               </Avatar>
               <div>

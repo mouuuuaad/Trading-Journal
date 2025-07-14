@@ -1,3 +1,6 @@
+
+"use client";
+
 import Link from "next/link";
 import { CircleUser, Menu, Settings } from "lucide-react";
 import React from "react";
@@ -103,7 +106,7 @@ export function Header({ children }: HeaderProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full h-9 w-9">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                <AvatarImage src={user?.photoURL || undefined} alt={user?.displayName || 'User'} />
                 <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
