@@ -50,9 +50,14 @@ export function AddTradeModal() {
   const { control, handleSubmit, reset } = useForm<TradeFormValues>({
     resolver: zodResolver(tradeSchema),
     defaultValues: {
+      asset: "",
       direction: "Buy",
+      entryPrice: undefined,
+      stopLoss: undefined,
+      takeProfit: undefined,
       result: "Win",
       date: new Date(),
+      notes: "",
     },
   });
 
@@ -140,7 +145,7 @@ export function AddTradeModal() {
               <Controller
                 name="entryPrice"
                 control={control}
-                render={({ field }) => <Input id="entryPrice" type="number" step="any" className="col-span-3" {...field} />}
+                render={({ field }) => <Input id="entryPrice" type="number" step="any" className="col-span-3" {...field} value={field.value ?? ""} />}
               />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
@@ -148,7 +153,7 @@ export function AddTradeModal() {
               <Controller
                 name="stopLoss"
                 control={control}
-                render={({ field }) => <Input id="stopLoss" type="number" step="any" className="col-span-3" {...field} />}
+                render={({ field }) => <Input id="stopLoss" type="number" step="any" className="col-span-3" {...field} value={field.value ?? ""} />}
               />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
@@ -156,7 +161,7 @@ export function AddTradeModal() {
               <Controller
                 name="takeProfit"
                 control={control}
-                render={({ field }) => <Input id="takeProfit" type="number" step="any" className="col-span-3" {...field} />}
+                render={({ field }) => <Input id="takeProfit" type="number" step="any" className="col-span-3" {...field} value={field.value ?? ""} />}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -183,7 +188,7 @@ export function AddTradeModal() {
               <Controller
                 name="notes"
                 control={control}
-                render={({ field }) => <Textarea id="notes" placeholder="Trade rationale, execution notes, etc." className="col-span-3" {...field} />}
+                render={({ field }) => <Textarea id="notes" placeholder="Trade rationale, execution notes, etc." className="col-span-3" {...field} value={field.value ?? ""} />}
               />
             </div>
           </div>
