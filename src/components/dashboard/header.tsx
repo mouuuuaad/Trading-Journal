@@ -17,9 +17,11 @@ import { ExportButton } from "./export-button";
 import { auth } from "@/lib/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const [user] = useAuthState(auth);
+  const router = useRouter();
 
   const handleLogout = () => {
     auth.signOut();
@@ -59,8 +61,8 @@ export function Header() {
           </Button>
         </SheetTrigger>
         <SheetContent side="left">
-          <SheetHeader className="sr-only">
-            <SheetTitle>Navigation Menu</SheetTitle>
+          <SheetHeader>
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
           </SheetHeader>
           <nav className="grid gap-6 text-lg font-medium">
             <Link
@@ -70,8 +72,14 @@ export function Header() {
               <TradeVisionIcon className="h-6 w-6" />
               <span>TradeVision</span>
             </Link>
-            <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
+            <Link href="/dashboard" className="hover:text-foreground">
               Dashboard
+            </Link>
+             <Link
+              href="/dashboard/settings"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Settings
             </Link>
           </nav>
         </SheetContent>
@@ -81,10 +89,12 @@ export function Header() {
             <AddTradeModal />
         </div>
         <ExportButton />
-        <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
-            <Settings className="h-5 w-5" />
-            <span className="sr-only">Settings</span>
-        </Button>
+        <Link href="/dashboard/settings" className="hidden sm:flex">
+          <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
+              <Settings className="h-5 w-5" />
+              <span className="sr-only">Settings</span>
+          </Button>
+        </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full h-9 w-9">
@@ -98,7 +108,7 @@ export function Header() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>{user?.displayName || user?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>Settings</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
              <DropdownMenuItem onClick={handleLogout}>
