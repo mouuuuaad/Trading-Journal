@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react";
@@ -31,7 +32,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 
@@ -52,14 +53,14 @@ export function AddTradeModal() {
   const [open, setOpen] = useState(false);
   const [user] = useAuthState(auth);
   const { toast } = useToast();
-  const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm<TradeFormValues>({
+  const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm<TradeFormValues>({
     resolver: zodResolver(tradeSchema),
     defaultValues: {
       asset: "",
       direction: "Buy",
-      entryPrice: 0,
-      stopLoss: 0,
-      takeProfit: 0,
+      entryPrice: undefined,
+      stopLoss: undefined,
+      takeProfit: undefined,
       result: "Win",
       date: new Date(),
       notes: "",
@@ -71,19 +72,33 @@ export function AddTradeModal() {
         toast({ title: "Error", description: "You must be logged in to add a trade.", variant: "destructive" });
         return;
     }
-    
-    const pnl = data.result === 'Win' 
-        ? Math.abs((data.takeProfit - data.entryPrice) * 100) // Example calculation, adjust as needed
-        : data.result === 'Loss' 
-        ? -Math.abs((data.entryPrice - data.stopLoss) * 100) // Example calculation
-        : 0;
+
+    let pnl = 0;
+    // A more realistic PnL calculation could involve contract size, etc.
+    // For now, we'll use a simplified price difference model.
+    const priceDiff = data.direction === 'Buy'
+        ? data.takeProfit - data.entryPrice
+        : data.entryPrice - data.takeProfit;
+
+    if (data.result === 'Win') {
+        pnl = Math.abs(priceDiff);
+    } else if (data.result === 'Loss') {
+        const risk = Math.abs(data.entryPrice - data.stopLoss);
+        pnl = -risk;
+    }
 
     try {
       await addDoc(collection(db, "trades"), {
-        ...data,
-        date: format(data.date, "yyyy-MM-dd"),
-        pnl,
         userId: user.uid,
+        asset: data.asset,
+        direction: data.direction,
+        entryPrice: data.entryPrice,
+        stopLoss: data.stopLoss,
+        takeProfit: data.takeProfit,
+        result: data.result,
+        notes: data.notes,
+        pnl,
+        date: data.date, // Storing as a Firebase Timestamp for better querying
       });
 
       toast({
@@ -120,13 +135,14 @@ export function AddTradeModal() {
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
+             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="asset" className="text-right">Asset</Label>
               <Controller
                 name="asset"
                 control={control}
                 render={({ field }) => <Input id="asset" placeholder="e.g., EUR/USD" className="col-span-3" {...field} />}
               />
+               {errors.asset && <p className="col-span-4 text-right text-sm text-destructive">{errors.asset.message}</p>}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="date" className="text-right">Date</Label>
@@ -174,24 +190,27 @@ export function AddTradeModal() {
               <Controller
                 name="entryPrice"
                 control={control}
-                render={({ field }) => <Input id="entryPrice" type="number" step="any" className="col-span-3" {...field} value={field.value ?? ""} />}
+                render={({ field }) => <Input id="entryPrice" type="number" step="any" placeholder="1.2500" className="col-span-3" {...field} value={field.value ?? ""} />}
               />
+              {errors.entryPrice && <p className="col-span-4 text-right text-sm text-destructive">{errors.entryPrice.message}</p>}
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="stopLoss" className="text-right">Stop Loss</Label>
               <Controller
                 name="stopLoss"
                 control={control}
-                render={({ field }) => <Input id="stopLoss" type="number" step="any" className="col-span-3" {...field} value={field.value ?? ""} />}
+                render={({ field }) => <Input id="stopLoss" type="number" step="any" placeholder="1.2450" className="col-span-3" {...field} value={field.value ?? ""} />}
               />
+              {errors.stopLoss && <p className="col-span-4 text-right text-sm text-destructive">{errors.stopLoss.message}</p>}
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="takeProfit" className="text-right">Take Profit</Label>
               <Controller
                 name="takeProfit"
                 control={control}
-                render={({ field }) => <Input id="takeProfit" type="number" step="any" className="col-span-3" {...field} value={field.value ?? ""} />}
+                render={({ field }) => <Input id="takeProfit" type="number" step="any" placeholder="1.2600" className="col-span-3" {...field} value={field.value ?? ""} />}
               />
+               {errors.takeProfit && <p className="col-span-4 text-right text-sm text-destructive">{errors.takeProfit.message}</p>}
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="result" className="text-right">Result</Label>
@@ -222,6 +241,7 @@ export function AddTradeModal() {
             </div>
           </div>
           <DialogFooter>
+             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
             <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Saving..." : "Save Trade"}
             </Button>

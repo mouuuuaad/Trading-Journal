@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Trade } from "@/lib/types";
+import { format } from "date-fns";
 
 interface TradeTableProps {
     trades: Trade[];
@@ -91,7 +92,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                       >
                         {trade.pnl >= 0 ? "+" : ""}${Math.abs(trade.pnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-right">{trade.date}</TableCell>
+                      <TableCell className="hidden md:table-cell text-right">{format(trade.date, "yyyy-MM-dd")}</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>

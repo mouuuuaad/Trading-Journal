@@ -19,6 +19,7 @@ import {
   startOfYear,
   parseISO,
 } from 'date-fns';
+import { Skeleton } from "@/components/ui/skeleton";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 
@@ -45,7 +46,8 @@ function filterTradesByDateRange(trades: Trade[], range: DateRange): Trade[] {
   }
 
   return trades.filter(trade => {
-    const tradeDate = parseISO(trade.date);
+    // Handle both Date objects and string dates from Firestore
+    const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
     return tradeDate >= startDate;
   });
 }
@@ -75,7 +77,7 @@ function calculateStats(trades: Trade[]) {
   const beTrades = trades.filter((trade) => trade.result === "BE").length;
 
   const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
-  
+
   const totalReward = trades.filter(t => t.result === 'Win').reduce((acc, trade) => {
       const reward = Math.abs(trade.takeProfit - trade.entryPrice);
       return acc + reward;
@@ -85,16 +87,20 @@ function calculateStats(trades: Trade[]) {
       const risk = Math.abs(trade.entryPrice - trade.stopLoss);
       return acc + risk;
   }, 0);
-  
+
   const averageReward = winningTrades > 0 ? totalReward / winningTrades : 0;
   const averageRisk = losingTrades > 0 ? totalRisk / losingTrades : 0;
-  
+
   const rrRatio = averageRisk > 0 ? averageReward / averageRisk : 0;
 
 
   const performanceData = trades
     .slice() // Create a shallow copy to avoid mutating the original array
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .sort((a, b) => {
+        const dateA = typeof a.date === 'string' ? new Date(a.date).getTime() : a.date.getTime();
+        const dateB = typeof b.date === 'string' ? new Date(b.date).getTime() : b.date.getTime();
+        return dateA - dateB;
+    })
     .reduce((acc, trade, index) => {
       const cumulativePnl = (acc[index - 1]?.pnl || 0) + (trade.pnl || 0);
       acc.push({ date: `Trade #${index + 1}`, pnl: cumulativePnl });
@@ -120,7 +126,7 @@ function calculateStats(trades: Trade[]) {
 
 
 export default function DashboardPage() {
-  const [user] = useAuthState(auth);
+  const [user, loadingUser] = useAuthState(auth);
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   const [dateRange, setDateRange] = useState<DateRange>("all");
 
@@ -131,46 +137,75 @@ export default function DashboardPage() {
     return null;
   }, [user]);
 
-  const [tradesSnapshot] = useCollection(tradesQuery);
+  const [tradesSnapshot, loadingTrades, error] = useCollection(tradesQuery);
 
   useEffect(() => {
     if (tradesSnapshot) {
-      const tradesData = tradesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Trade));
+      const tradesData = tradesSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+            id: doc.id,
+            ...data,
+            // Firestore timestamps need to be converted to Date objects
+            date: data.date.toDate ? data.date.toDate() : new Date(data.date),
+        } as Trade;
+      });
       setAllTrades(tradesData);
     } else {
       setAllTrades([]);
     }
   }, [tradesSnapshot]);
-  
+
+  if (error) {
+    console.error("Error fetching trades:", error);
+    // Optionally render an error state to the user
+  }
+
   const filteredTrades = useMemo(() => filterTradesByDateRange(allTrades, dateRange), [allTrades, dateRange]);
   const stats = useMemo(() => calculateStats(filteredTrades), [filteredTrades]);
-  const allTimeStats = useMemo(() => calculateStats(allTrades), [allTrades]);
+
+  const isLoading = loadingUser || loadingTrades;
 
   return (
     <>
       <Header />
       <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
-        <StatsCards 
-          totalPnl={stats.totalPnl}
-          winRate={stats.winRate}
-          winningTrades={stats.winningTrades}
-          totalTrades={stats.totalTrades}
-          rrRatio={stats.rrRatio}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-        />
+        {isLoading ? (
+             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+            </div>
+        ) : (
+            <StatsCards
+              totalPnl={stats.totalPnl}
+              winRate={stats.winRate}
+              winningTrades={stats.winningTrades}
+              totalTrades={stats.totalTrades}
+              rrRatio={stats.rrRatio}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+            />
+        )}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
-          <div className="lg:col-span-4">
-            <PerformanceChart data={stats.performanceData} />
-          </div>
-          <div className="lg:col-span-3">
-            <WinLossChart data={stats.winLossData} />
-          </div>
+            {isLoading ? (
+                <>
+                    <Skeleton className="lg:col-span-4 h-[325px]" />
+                    <Skeleton className="lg:col-span-3 h-[325px]" />
+                </>
+            ) : (
+                <>
+                    <div className="lg:col-span-4">
+                        <PerformanceChart data={stats.performanceData} />
+                    </div>
+                    <div className="lg:col-span-3">
+                        <WinLossChart data={stats.winLossData} />
+                    </div>
+                </>
+            )}
         </div>
-        <TradeTable trades={filteredTrades} />
+         {isLoading ? <Skeleton className="h-96" /> : <TradeTable trades={filteredTrades} />}
       </main>
     </>
   );

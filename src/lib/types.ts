@@ -1,6 +1,6 @@
 export type Trade = {
   id: string;
-  date: string;
+  date: Date; // Changed to Date for easier sorting and filtering
   asset: string;
   direction: 'Buy' | 'Sell';
   entryPrice: number;
