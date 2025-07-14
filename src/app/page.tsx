@@ -6,33 +6,32 @@ import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 import { TradeVisionIcon } from '@/components/icons';
 import { FilePenLine, PieChart, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
 
 export default function LandingPage() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Refs for each element to be animated
+
   const titleGroupRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<SVGSVGElement>(null);
   const titleTextRef = useRef<HTMLHeadingElement>(null);
 
   const subtitleRef = useRef<HTMLParagraphElement>(null);
-  
+
   const featuresRef = useRef<HTMLDivElement>(null);
   const feature1Ref = useRef<HTMLDivElement>(null);
   const feature2Ref = useRef<HTMLDivElement>(null);
   const feature3Ref = useRef<HTMLDivElement>(null);
 
   const finalCtaRef = useRef<HTMLParagraphElement>(null);
+  const creatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Ensure container is visible before starting animations
     gsap.set(containerRef.current, { opacity: 1 });
 
     const tl = gsap.timeline({
       delay: 0.5,
       onComplete: () => {
-        // Final fade out of the entire scene before redirecting
         gsap.to(containerRef.current, {
           opacity: 0,
           duration: 1,
@@ -44,8 +43,6 @@ export default function LandingPage() {
       },
     });
 
-    // --- ACT I: THE BLUEPRINT ---
-    // The icon is "drawn" and the title is "typed"
     tl.fromTo(
       titleGroupRef.current,
       { scale: 0.8, opacity: 0 },
@@ -55,7 +52,7 @@ export default function LandingPage() {
         iconRef.current,
         { rotation: -360, scale: 0 },
         { rotation: 0, scale: 1, duration: 1, ease: 'back.out(1.7)'},
-        "<" // at the same time as the group fades in
+        "<"
     )
     .fromTo(
         titleTextRef.current,
@@ -64,10 +61,8 @@ export default function LandingPage() {
         "-=0.7"
     );
 
-    tl.to({}, { duration: 1 }); // Pause to let the title sink in
+    tl.to({}, { duration: 1 });
 
-    // --- ACT II: THE VISION UNFOLDS ---
-    // Title moves up, subtitle fades in, features appear
     tl.to(titleGroupRef.current, {
         y: () => -(containerRef.current!.clientHeight / 2) + (titleGroupRef.current!.clientHeight / 2) + 40,
         scale: 0.7,
@@ -78,7 +73,7 @@ export default function LandingPage() {
     tl.fromTo(subtitleRef.current,
         { opacity: 0 },
         { opacity: 1, duration: 1, ease: 'power1.inOut' },
-        "<+0.5" // Start slightly after the title starts moving
+        "<+0.5"
     );
 
     const features = [feature1Ref.current, feature2Ref.current, feature3Ref.current];
@@ -96,10 +91,8 @@ export default function LandingPage() {
     }, "-=1");
 
 
-    tl.to({}, { duration: 1.5 }); // Another pause to show the features
+    tl.to({}, { duration: 1.5 });
 
-    // --- ACT III: THE TRANSFORMATION ---
-    // Features and subtitle fade out
     tl.to([featuresRef.current, subtitleRef.current], {
         opacity: 0,
         y: -30,
@@ -108,15 +101,20 @@ export default function LandingPage() {
         stagger: 0.1
     });
 
-    // --- ACT IV: THE MOTIVATIONAL CLIMAX ---
-    // Final CTA appears with impact
     tl.fromTo(
         finalCtaRef.current,
         { opacity: 0, scale: 0.8 },
         { opacity: 1, scale: 1, duration: 1.2, ease: 'elastic.out(1, 0.5)'}
     );
+     tl.fromTo(
+        creatorRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 1, ease: 'power2.out'},
+        "-=0.5"
+    );
 
-    tl.to({}, { duration: 2 }); // Final hold before the main fadeout begins
+
+    tl.to({}, { duration: 2 });
 
   }, [router]);
 
@@ -125,7 +123,6 @@ export default function LandingPage() {
       ref={containerRef}
       className="flex min-h-screen w-full flex-col items-center justify-center bg-background text-center overflow-hidden p-4 opacity-0"
     >
-        {/* All animated elements are absolutely positioned for full layout control by GSAP */}
         <div ref={titleGroupRef} className="absolute flex flex-col items-center gap-4 opacity-0">
             <TradeVisionIcon ref={iconRef} className="h-24 w-24" />
             <h1 ref={titleTextRef}
@@ -158,6 +155,12 @@ export default function LandingPage() {
             Your Journey Starts Now
         </p>
 
+         <div ref={creatorRef} className="absolute bottom-8 opacity-0">
+            <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+                <TradeVisionIcon className="h-5 w-5" />
+                <span>Created by Mouaad Idoufkir</span>
+            </Link>
+        </div>
     </div>
   );
 }
