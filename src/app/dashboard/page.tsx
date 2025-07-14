@@ -20,6 +20,7 @@ import {
   parseISO,
 } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
+import { ExportButton } from "@/components/dashboard/export-button";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 
@@ -59,6 +60,8 @@ function calculateStats(trades: Trade[]) {
       totalPnl: 0,
       winRate: 0,
       winningTrades: 0,
+      losingTrades: 0,
+      beTrades: 0,
       totalTrades: 0,
       rrRatio: 0,
       performanceData: [],
@@ -117,6 +120,8 @@ function calculateStats(trades: Trade[]) {
     totalPnl,
     winRate,
     winningTrades,
+    losingTrades,
+    beTrades,
     totalTrades,
     rrRatio,
     performanceData,
@@ -171,7 +176,9 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Header />
+      <Header>
+        <ExportButton trades={filteredTrades} stats={stats} user={user} />
+      </Header>
       <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
         {isLoading ? (
              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CircleUser, Menu, Settings } from "lucide-react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,13 +14,16 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { TradeVisionIcon } from "../icons";
 import { AddTradeModal } from "./add-trade-modal";
-import { ExportButton } from "./export-button";
 import { auth } from "@/lib/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useRouter } from "next/navigation";
 
-export function Header() {
+type HeaderProps = {
+  children?: React.ReactNode;
+}
+
+export function Header({ children }: HeaderProps) {
   const [user] = useAuthState(auth);
   const router = useRouter();
 
@@ -88,7 +92,7 @@ export function Header() {
         <div className="ml-auto flex-1 sm:flex-initial">
             <AddTradeModal />
         </div>
-        <ExportButton />
+        {children}
         <Link href="/dashboard/settings" className="hidden sm:flex">
           <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
               <Settings className="h-5 w-5" />
