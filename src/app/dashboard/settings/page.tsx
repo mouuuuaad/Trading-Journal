@@ -1,7 +1,7 @@
 "use client";
 
+import * as React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollection } from "react-firebase-hooks/firestore";
 import { auth, db } from "@/lib/firebase";
 import {
   collection,
