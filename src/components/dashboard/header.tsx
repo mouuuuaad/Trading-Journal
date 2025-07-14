@@ -14,8 +14,27 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { TradeVisionIcon } from "../icons";
 import { AddTradeModal } from "./add-trade-modal";
 import { ExportButton } from "./export-button";
+import { auth } from "@/lib/firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function Header() {
+  const [user] = useAuthState(auth);
+
+  const handleLogout = () => {
+    auth.signOut();
+  };
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return "U";
+    const names = name.split(' ');
+    if (names.length > 1) {
+      return names[0][0] + names[1][0];
+    }
+    return names[0][0];
+  };
+
+
   return (
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-10">
       <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
@@ -67,18 +86,21 @@ export function Header() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
-              <CircleUser className="h-5 w-5" />
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || 'User'} />
+                <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+              </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{user?.displayName || user?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
-             <DropdownMenuItem asChild>
-                <Link href="/">Logout</Link>
+             <DropdownMenuItem onClick={handleLogout}>
+                Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

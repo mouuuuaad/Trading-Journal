@@ -1,27 +1,41 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { collection, query, where } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { WinLossChart } from "@/components/dashboard/win-loss-chart";
 import { TradeTable } from "@/components/dashboard/trade-table";
-import { mockTrades } from "@/lib/mock-data";
 import { Trade } from "@/lib/types";
 
 function calculateStats(trades: Trade[]) {
-  const totalPnl = trades.reduce((acc, trade) => acc + trade.pnl, 0);
+  if (!trades || trades.length === 0) {
+    return {
+      totalPnl: 0,
+      winRate: 0,
+      winningTrades: 0,
+      totalTrades: 0,
+      rrRatio: 0,
+      performanceData: [],
+      winLossData: [
+        { name: 'Wins', value: 0, fill: "hsl(var(--accent))" },
+        { name: 'Losses', value: 0, fill: "hsl(var(--destructive))" },
+        { name: 'Break Even', value: 0, fill: "hsl(var(--muted-foreground))" },
+      ],
+    };
+  }
+
+  const totalPnl = trades.reduce((acc, trade) => acc + (trade.pnl || 0), 0);
   const totalTrades = trades.length;
   const winningTrades = trades.filter((trade) => trade.result === "Win").length;
   const losingTrades = trades.filter((trade) => trade.result === "Loss").length;
   const beTrades = trades.filter((trade) => trade.result === "BE").length;
 
   const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
-  
-  const totalRisk = trades.reduce((acc, trade) => {
-    if (trade.direction === 'Buy') {
-      return acc + (trade.entryPrice - trade.stopLoss);
-    } else {
-      return acc + (trade.stopLoss - trade.entryPrice);
-    }
-  }, 0);
   
   const totalReward = trades.reduce((acc, trade) => {
     if (trade.direction === 'Buy') {
@@ -31,15 +45,23 @@ function calculateStats(trades: Trade[]) {
     }
   }, 0);
 
-  const averageRisk = totalRisk / totalTrades;
-  const averageReward = totalReward / totalTrades;
-  const rrRatio = averageRisk > 0 ? averageReward / averageRisk : 0;
+  const totalRisk = trades.reduce((acc, trade) => {
+    if (trade.direction === 'Buy') {
+      return acc + (trade.entryPrice - trade.stopLoss);
+    } else {
+      return acc + (trade.stopLoss - trade.entryPrice);
+    }
+  }, 0);
 
+  const averageRisk = totalTrades > 0 ? totalRisk / totalTrades : 0;
+  const averageReward = totalTrades > 0 ? totalReward / totalTrades : 0;
+
+  const rrRatio = averageRisk > 0 ? Math.abs(averageReward / averageRisk) : 0;
 
   const performanceData = trades
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .reduce((acc, trade, index) => {
-      const cumulativePnl = (acc[index - 1]?.pnl || 0) + trade.pnl;
+      const cumulativePnl = (acc[index - 1]?.pnl || 0) + (trade.pnl || 0);
       acc.push({ date: `Trade #${index + 1}`, pnl: cumulativePnl });
       return acc;
     }, [] as { date: string; pnl: number }[]);
@@ -49,7 +71,6 @@ function calculateStats(trades: Trade[]) {
     { name: 'Losses', value: losingTrades, fill: "hsl(var(--destructive))" },
     { name: 'Break Even', value: beTrades, fill: "hsl(var(--muted-foreground))" },
   ];
-
 
   return {
     totalPnl,
@@ -64,7 +85,31 @@ function calculateStats(trades: Trade[]) {
 
 
 export default function DashboardPage() {
-  const stats = calculateStats(mockTrades);
+  const [user] = useAuthState(auth);
+  const [trades, setTrades] = useState<Trade[]>([]);
+
+  const tradesQuery = useMemo(() => {
+    if (user) {
+      return query(collection(db, "trades"), where("userId", "==", user.uid));
+    }
+    return null;
+  }, [user]);
+
+  const [tradesSnapshot] = useCollection(tradesQuery);
+
+  useEffect(() => {
+    if (tradesSnapshot) {
+      const tradesData = tradesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Trade));
+      setTrades(tradesData);
+    } else {
+      setTrades([]);
+    }
+  }, [tradesSnapshot]);
+  
+  const stats = calculateStats(trades);
 
   return (
     <>
@@ -85,7 +130,7 @@ export default function DashboardPage() {
             <WinLossChart data={stats.winLossData} />
           </div>
         </div>
-        <TradeTable />
+        <TradeTable trades={trades} />
       </main>
     </>
   );

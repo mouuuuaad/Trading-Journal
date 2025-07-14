@@ -30,6 +30,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { auth, db } from "@/lib/firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+
 
 const tradeSchema = z.object({
   asset: z.string().min(1, "Asset is required"),
@@ -46,30 +50,55 @@ type TradeFormValues = z.infer<typeof tradeSchema>;
 
 export function AddTradeModal() {
   const [open, setOpen] = useState(false);
+  const [user] = useAuthState(auth);
   const { toast } = useToast();
-  const { control, handleSubmit, reset } = useForm<TradeFormValues>({
+  const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm<TradeFormValues>({
     resolver: zodResolver(tradeSchema),
     defaultValues: {
       asset: "",
       direction: "Buy",
-      entryPrice: undefined,
-      stopLoss: undefined,
-      takeProfit: undefined,
+      entryPrice: 0,
+      stopLoss: 0,
+      takeProfit: 0,
       result: "Win",
       date: new Date(),
       notes: "",
     },
   });
 
-  const onSubmit = (data: TradeFormValues) => {
-    console.log(data);
-    toast({
-      title: "Trade Logged",
-      description: `Successfully added trade for ${data.asset}.`,
-      variant: "default",
-    });
-    reset();
-    setOpen(false);
+  const onSubmit = async (data: TradeFormValues) => {
+    if (!user) {
+        toast({ title: "Error", description: "You must be logged in to add a trade.", variant: "destructive" });
+        return;
+    }
+    
+    const pnl = data.result === 'Win' 
+        ? Math.abs((data.takeProfit - data.entryPrice) * 100) // Example calculation, adjust as needed
+        : data.result === 'Loss' 
+        ? -Math.abs((data.entryPrice - data.stopLoss) * 100) // Example calculation
+        : 0;
+
+    try {
+      await addDoc(collection(db, "trades"), {
+        ...data,
+        date: format(data.date, "yyyy-MM-dd"),
+        pnl,
+        userId: user.uid,
+      });
+
+      toast({
+        title: "Trade Logged",
+        description: `Successfully added trade for ${data.asset}.`,
+      });
+      reset();
+      setOpen(false);
+    } catch (error: any) {
+        toast({
+            title: "Error saving trade",
+            description: error.message,
+            variant: "destructive",
+        });
+    }
   };
 
   return (
@@ -193,7 +222,9 @@ export function AddTradeModal() {
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Save Trade</Button>
+            <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save Trade"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
