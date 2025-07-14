@@ -10,14 +10,16 @@ import {
 } from "@/components/ui/card";
 import {
   ChartContainer,
-  ChartTooltip,
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
-import { winLossData } from "@/lib/mock-data";
 
-export function WinLossChart() {
+type WinLossChartProps = {
+  data: { name: string; value: number; fill: string; }[];
+};
+
+export function WinLossChart({ data }: WinLossChartProps) {
   const chartConfig = {
     value: {
       label: "Trades",
@@ -51,7 +53,7 @@ export function WinLossChart() {
                 content={<ChartTooltipContent hideLabel />}
               />
               <Pie
-                data={winLossData}
+                data={data}
                 dataKey="value"
                 nameKey="name"
                 innerRadius={60}

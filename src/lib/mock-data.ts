@@ -10,19 +10,3 @@ export const mockTrades: Trade[] = [
   { id: '7', date: '2024-07-16', asset: 'GOLD', direction: 'Buy', entryPrice: 2330, stopLoss: 2320, takeProfit: 2360, result: 'Win', pnl: 3000 },
   { id: '8', date: '2024-07-15', asset: 'SPX500', direction: 'Sell', entryPrice: 5500, stopLoss: 5520, takeProfit: 5450, result: 'BE', pnl: 0 },
 ];
-
-export const performanceData = [
-  { date: 'Jan', pnl: 1200 },
-  { date: 'Feb', pnl: -500 },
-  { date: 'Mar', pnl: 2800 },
-  { date: 'Apr', pnl: 1500 },
-  { date: 'May', pnl: 3200 },
-  { date: 'Jun', pnl: 2500 },
-  { date: 'Jul', pnl: 5500 },
-];
-
-export const winLossData = [
-  { name: 'Wins', value: 5, fill: "hsl(var(--accent))" },
-  { name: 'Losses', value: 2, fill: "hsl(var(--destructive))" },
-  { name: 'Break Even', value: 1, fill: "hsl(var(--muted-foreground))" },
-];
