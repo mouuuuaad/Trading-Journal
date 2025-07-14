@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -7,7 +8,7 @@ import { auth } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 import { authorizedUsers } from '@/lib/config';
 
-const publicRoutes = ['/', '/signup', '/guest'];
+const publicRoutes = ['/login', '/signup', '/guest', '/'];
 const privateRoutePrefix = '/dashboard';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
        // User is not logged in
        if (isPrivateRoute) {
          // Trying to access a private route without being logged in, send to login
-         router.push('/');
+         router.push('/login');
        }
     }
 

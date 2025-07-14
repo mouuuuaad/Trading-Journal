@@ -1,107 +1,70 @@
+
 "use client";
 
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { TradeVisionIcon } from '@/components/icons';
-import { useForm, SubmitHandler } from "react-hook-form";
-import * as z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
+import { gsap } from 'gsap';
+import { TradeVisionIcon } from '@/components/icons';
+import { cn } from '@/lib/utils';
 
-
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginSchema = z.infer<typeof loginSchema>;
-
-
-export default function LoginPage() {
+export default function LandingPage() {
   const router = useRouter();
-  const { toast } = useToast();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginSchema>({
-    resolver: zodResolver(loginSchema),
-  });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const iconRef = useRef<SVGSVGElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
 
-  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
-    try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      // AuthProvider will handle the redirect
-    } catch (error: any) {
-      toast({
-        title: "Login Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
+  useEffect(() => {
+    const tl = gsap.timeline({
+      onComplete: () => {
+        gsap.to(containerRef.current, {
+          opacity: 0,
+          duration: 0.5,
+          onComplete: () => {
+            router.push('/signup');
+          },
+        });
+      },
+    });
 
-  const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      // AuthProvider will handle the redirect
-    } catch (error: any) {
-      toast({
-        title: "Google Sign-In Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
+    tl.fromTo(
+      iconRef.current,
+      { scale: 0, opacity: 0, rotation: -180 },
+      { scale: 1, opacity: 1, rotation: 0, duration: 1, ease: 'power3.out' }
+    )
+      .fromTo(
+        titleRef.current,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' },
+        '-=0.5'
+      )
+      .fromTo(
+        subtitleRef.current,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
+        '-=0.4'
+      )
+      .to({}, { duration: 1.5 }); // Hold the final state for a moment
+
+  }, [router]);
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-muted/40 p-4">
-      <Card className="mx-auto w-full max-w-sm">
-        <CardHeader className="text-center space-y-2">
-          <TradeVisionIcon className="mx-auto h-12 w-auto" />
-          <CardTitle className="font-headline text-3xl">TradeVision</CardTitle>
-          <CardDescription>Enter your credentials to access your trading journal</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" {...register("email")} disabled={isSubmitting} />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
-            </div>
-            <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register("password")} disabled={isSubmitting}/>
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-            </div>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Logging in..." : "Login"}
-            </Button>
-          </form>
-            <div className="relative mt-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn} disabled={isSubmitting}>
-              Sign in with Google
-            </Button>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="underline">
-              Sign up
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+    <div
+      ref={containerRef}
+      className="flex min-h-screen w-full flex-col items-center justify-center bg-background text-center overflow-hidden"
+    >
+      <div className="flex flex-col items-center gap-4">
+        <TradeVisionIcon ref={iconRef} className="h-24 w-24" />
+        <h1
+          ref={titleRef}
+          className="font-headline text-5xl sm:text-7xl font-bold tracking-tighter text-foreground"
+        >
+          TradeVision
+        </h1>
+        <p ref={subtitleRef} className="text-lg text-muted-foreground">
+          Your Personal Trading Journal, Reimagined.
+        </p>
+      </div>
     </div>
   );
 }

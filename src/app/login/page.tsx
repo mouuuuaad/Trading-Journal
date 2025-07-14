@@ -10,34 +10,34 @@ import { TradeVisionIcon } from '@/components/icons';
 import { useForm, SubmitHandler } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createUserWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
-const signupSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+
+const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-type SignupSchema = z.infer<typeof signupSchema>;
+type LoginSchema = z.infer<typeof loginSchema>;
 
-export default function SignupPage() {
+
+export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignupSchema>({
-    resolver: zodResolver(signupSchema),
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit: SubmitHandler<SignupSchema> = async (data) => {
+  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      await updateProfile(userCredential.user, { displayName: data.name });
+      await signInWithEmailAndPassword(auth, data.email, data.password);
       // AuthProvider will handle the redirect
     } catch (error: any) {
       toast({
-        title: "Signup Failed",
+        title: "Login Failed",
         description: error.message,
         variant: "destructive",
       });
@@ -63,16 +63,11 @@ export default function SignupPage() {
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader className="text-center space-y-2">
           <TradeVisionIcon className="mx-auto h-12 w-auto" />
-          <CardTitle className="font-headline text-3xl">Create Account</CardTitle>
-          <CardDescription>Enter your details to create a new TradeVision account</CardDescription>
+          <CardTitle className="font-headline text-3xl">TradeVision</CardTitle>
+          <CardDescription>Enter your credentials to access your trading journal</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" type="text" placeholder="John Doe" {...register("name")} disabled={isSubmitting} />
-              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-            </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="m@example.com" {...register("email")} disabled={isSubmitting} />
@@ -80,14 +75,14 @@ export default function SignupPage() {
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register("password")} disabled={isSubmitting} />
+              <Input id="password" type="password" {...register("password")} disabled={isSubmitting}/>
               {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Creating Account..." : "Create Account"}
+              {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </form>
-          <div className="relative mt-4">
+            <div className="relative mt-4">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -98,12 +93,12 @@ export default function SignupPage() {
               </div>
             </div>
             <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn} disabled={isSubmitting}>
-              Sign up with Google
+              Sign in with Google
             </Button>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{' '}
-            <Link href="/login" className="underline">
-              Login
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="underline">
+              Sign up
             </Link>
           </div>
         </CardContent>

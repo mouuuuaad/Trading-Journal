@@ -23,7 +23,7 @@ export default function GuestPage() {
 
   const handleLogout = async () => {
     await auth.signOut();
-    router.push("/");
+    router.push("/login");
   };
 
   const getInitials = (name: string | null | undefined) => {
@@ -90,7 +90,7 @@ export default function GuestPage() {
             </Button>
         </CardContent>
        </Card>
-        <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+        <Link href="/login" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
             <TradeVisionIcon className="h-5 w-5" />
             <span>Powered by TradeVision</span>
         </Link>
