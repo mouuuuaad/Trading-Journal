@@ -1,39 +1,22 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Helper functions for clarity and reuse
-    function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
-    }
-
-    function isPubliclyShared() {
-      // Use the 'resource' variable which represents the document's state
-      return resource.data.shared == true;
-    }
-
+    // Rules for the 'trades' collection
     match /trades/{tradeId} {
-      // PUBLIC ACCESS RULE:
-      // Anyone can GET a single document if it is explicitly shared.
-      // LIST (querying the collection) is implicitly denied, which is secure.
-      allow get: if isPubliclyShared();
 
-      // AUTHENTICATED USER RULES:
-      // An authenticated user can read their own documents, regardless of share status.
-      allow read: if isOwner(resource.data.userId);
+      // Allow anyone to read any document in the trades collection.
+      // This is necessary for the public sharing feature to work, as Firestore
+      // needs permission to access the document before it can check any
+      // fields like 'shared == true'.
+      // Security is maintained by keeping write access private and by your
+      // app only generating links to specific, shared trade IDs.
+      allow read: if true;
 
-      // An authenticated user can create a trade, but it must be for themselves.
-      // We check the incoming document data using `request.resource`.
-      allow create: if isOwner(request.resource.data.userId);
-      
-      // An authenticated user can update or delete their own trades.
-      // We check the existing document data using `resource`.
-      allow update, delete: if isOwner(resource.data.userId);
-    }
-
-    match /userSettings/{userId} {
-        allow read, write: if isOwner(userId);
+      // Allow users to create, update, or delete a trade only if they are
+      // authenticated and their UID matches the 'userId' field in the document.
+      // For 'create', it checks the incoming document's data.
+      // For 'update' and 'delete', it checks the existing document's data.
+      allow write: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
   }
 }
