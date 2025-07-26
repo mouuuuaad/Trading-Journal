@@ -84,18 +84,15 @@ export function AddTradeModal() {
     }
 
     let pnl = 0;
-    // A more realistic PnL calculation could involve contract size, etc.
-    // For now, we'll use a simplified price difference model.
-    const priceDiff = data.direction === 'Buy'
-        ? data.takeProfit - data.entryPrice
-        : data.entryPrice - data.takeProfit;
-
+    const risk = Math.abs(data.entryPrice - data.stopLoss);
+    
     if (data.result === 'Win') {
-        pnl = Math.abs(priceDiff);
+        const reward = Math.abs(data.takeProfit - data.entryPrice);
+        pnl = data.direction === 'Buy' ? reward : reward; // PnL is positive for wins
     } else if (data.result === 'Loss') {
-        const risk = Math.abs(data.entryPrice - data.stopLoss);
-        pnl = -risk;
+        pnl = -risk; // PnL is negative for losses
     }
+    // For 'BE', PnL remains 0
 
     try {
       await addDoc(collection(db, "trades"), {

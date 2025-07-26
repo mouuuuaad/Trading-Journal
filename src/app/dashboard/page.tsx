@@ -35,7 +35,7 @@ function filterTradesByDateRange(trades: Trade[], range: DateRange): Trade[] {
       startDate = startOfToday();
       break;
     case 'this-week':
-      startDate = startOfWeek(now);
+      startDate = startOfWeek(now, { weekStartsOn: 1 }); // Assuming week starts on Monday
       break;
     case 'this-month':
       startDate = startOfMonth(now);
@@ -49,7 +49,6 @@ function filterTradesByDateRange(trades: Trade[], range: DateRange): Trade[] {
   }
 
   return trades.filter(trade => {
-    // Handle both Date objects and string dates from Firestore
     const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
     return tradeDate >= startDate;
   });
@@ -137,11 +136,11 @@ function calculateStats(trades: Trade[]) {
   ];
 
   trades.forEach(trade => {
-    // getDay() returns 0 for Sunday, 1 for Monday, etc.
-    // We adjust it to be Monday-first (0-6)
     const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
+    // getDay() returns 0 for Sunday, 1 for Monday, etc.
+    // We adjust it to be Monday-first (0) to Saturday (5), Sunday (6)
     const dayIndex = (getDay(tradeDate) + 6) % 7;
-    if (dayIndex >= 0 && dayIndex < 7) { // Should always be true
+     if (dayIndex >= 0 && dayIndex < 7) {
         weekdayPnl[dayIndex].pnl += trade.pnl;
     }
   });
@@ -174,7 +173,7 @@ export default function DashboardPage() {
 
   const tradesQuery = useMemo(() => {
     if (user) {
-      // ** FIX: Remove the orderBy clause to avoid needing a composite index **
+      // ** REMOVED orderBy for client-side sorting **
       return query(collection(db, "trades"), where("userId", "==", user.uid));
     }
     return null;
@@ -189,21 +188,20 @@ export default function DashboardPage() {
         return {
             id: doc.id,
             ...data,
-            // Firestore timestamps need to be converted to Date objects
-            date: data.date.toDate ? data.date.toDate() : new Date(data.date),
+            // Convert Firestore Timestamps to JS Date objects
+            date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
         } as Trade;
       });
-      // ** FIX: Sort the data here in the client-side code **
+      // Sort trades by date on the client side
       tradesData.sort((a, b) => b.date.getTime() - a.date.getTime());
       setAllTrades(tradesData);
     } else {
-      setAllTrades([]);
+        setAllTrades([]);
     }
   }, [tradesSnapshot]);
 
   if (error) {
     console.error("Error fetching trades:", error);
-    // Optionally render an error state to the user
   }
 
   const filteredTrades = useMemo(() => filterTradesByDateRange(allTrades, dateRange), [allTrades, dateRange]);
@@ -239,31 +237,33 @@ export default function DashboardPage() {
             />
         )}
 
-        {isLoading ? (
-          <div className="grid gap-4 md:gap-8">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <Skeleton className="lg:col-span-4 h-[325px]" />
-              <Skeleton className="lg:col-span-3 h-[325px]" />
-            </div>
-            <Skeleton className="h-[325px]" />
-            <Skeleton className="h-96" />
-          </div>
-        ) : (
-          <>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
-              <div className="lg:col-span-4">
-                  <PerformanceChart data={stats.performanceData} />
+        <div className="grid gap-4 md:gap-8">
+          {isLoading ? (
+            <>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <Skeleton className="lg:col-span-4 h-[325px]" />
+                <Skeleton className="lg:col-span-3 h-[325px]" />
               </div>
-              <div className="lg:col-span-3">
-                  <WinLossChart data={stats.winLossData} />
+              <Skeleton className="h-[325px]" />
+              <Skeleton className="h-96" />
+            </>
+          ) : (
+            <>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
+                <div className="lg:col-span-4">
+                    <PerformanceChart data={stats.performanceData} />
+                </div>
+                <div className="lg:col-span-3">
+                    <WinLossChart data={stats.winLossData} />
+                </div>
               </div>
-            </div>
-            <div className="grid gap-4 md:gap-8">
-              <WeekdayPerformanceChart data={stats.weekdayPerformance} />
-            </div>
-            <TradeTable trades={filteredTrades} />
-          </>
-        )}
+              <div className="grid gap-4 md:gap-8">
+                <WeekdayPerformanceChart data={stats.weekdayPerformance} />
+              </div>
+              <TradeTable trades={filteredTrades} />
+            </>
+          )}
+        </div>
       </main>
     </>
   );
