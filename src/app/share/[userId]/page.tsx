@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useParams } from "next/navigation";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, query, where, getDocs, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -152,7 +153,10 @@ function calculateStats(trades: Trade[]) {
 }
 
 
-export default function SharePage({ params: { userId } }: { params: { userId: string } }) {
+export default function SharePage() {
+  const params = useParams();
+  const userId = params.userId as string;
+
   const [userProfile, setUserProfile] = useState<{ uid: string; displayName: string; photoURL: string } | null>(null);
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   
@@ -172,7 +176,9 @@ export default function SharePage({ params: { userId } }: { params: { userId: st
             setUserProfile(profile);
         }
     };
-    fetchProfile();
+    if (userId) {
+      fetchProfile();
+    }
   }, [userId])
 
   useEffect(() => {
@@ -218,7 +224,7 @@ export default function SharePage({ params: { userId } }: { params: { userId: st
         disableTransitionOnChange
     >
     <main className="flex-1 space-y-4 p-4 sm:p-6 md:p-8">
-        {isLoading ? (
+        {isLoading || !userId ? (
             <div className="max-w-5xl mx-auto space-y-8">
                 <Skeleton className="h-24 w-full" />
                 <Skeleton className="h-28 w-full" />
