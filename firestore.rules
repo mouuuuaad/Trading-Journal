@@ -3,13 +3,11 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Rules for the 'trades' collection
     match /trades/{tradeId} {
-      // Anyone can read (get, list) the trade data.
-      // This is necessary for the public sharing page to query trades by userId.
+      // Allow anyone to read the data (for public share pages)
       allow read: if true;
 
-      // Only the authenticated user who owns the trade can write (create, update, delete).
+      // Allow only the authenticated owner to write (create, update, delete)
       allow write: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
   }
