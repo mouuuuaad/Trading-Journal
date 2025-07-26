@@ -49,8 +49,8 @@ export function TradeTable({ trades }: TradeTableProps) {
     <>
     <Card>
       <CardHeader className="px-4 pt-4 sm:px-6 sm:pt-6">
-        <CardTitle className="font-headline">Recent Trades</CardTitle>
-        <CardDescription>A log of your most recent trades.</CardDescription>
+        <CardTitle className="font-headline">Trade Log</CardTitle>
+        <CardDescription>A log of your trades. Use the filters above to refine your view.</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
@@ -127,7 +127,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                   ))
               ) : (
                   <TableRow>
-                      <TableCell colSpan={5} className="text-center h-24">No trades yet. Add one to get started!</TableCell>
+                      <TableCell colSpan={5} className="text-center h-24">No trades match the current filters.</TableCell>
                   </TableRow>
               )}
             </TableBody>
@@ -145,5 +145,3 @@ export function TradeTable({ trades }: TradeTableProps) {
     </>
   );
 }
-
-    

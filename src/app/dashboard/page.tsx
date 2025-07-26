@@ -23,19 +23,25 @@ import {
 } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExportButton } from "@/components/dashboard/export-button";
+import { TradeFilters } from "@/components/dashboard/trade-filters";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
+type FilterType = "asset" | "result" | "direction";
 
-function filterTradesByDateRange(trades: Trade[], range: DateRange): Trade[] {
+function filterTrades(
+    trades: Trade[],
+    dateRange: DateRange,
+    filters: { asset: string; result: string; direction: string }
+): Trade[] {
   const now = new Date();
   let startDate: Date;
 
-  switch (range) {
+  switch (dateRange) {
     case 'today':
       startDate = startOfToday();
       break;
     case 'this-week':
-      startDate = startOfWeek(now, { weekStartsOn: 1 }); // Assuming week starts on Monday
+      startDate = startOfWeek(now, { weekStartsOn: 1 });
       break;
     case 'this-month':
       startDate = startOfMonth(now);
@@ -45,15 +51,37 @@ function filterTradesByDateRange(trades: Trade[], range: DateRange): Trade[] {
       break;
     case 'all':
     default:
-      return trades;
+      // No date filtering
+      break;
   }
 
   return trades.filter(trade => {
-    const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
-    return tradeDate >= startDate;
+    // Date Range Filter
+    if (dateRange !== 'all') {
+        const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
+        if (tradeDate < startDate) {
+            return false;
+        }
+    }
+
+    // Asset Filter
+    if (filters.asset !== 'all' && trade.asset !== filters.asset) {
+        return false;
+    }
+
+    // Result Filter
+    if (filters.result !== 'all' && trade.result !== filters.result) {
+        return false;
+    }
+
+    // Direction Filter
+    if (filters.direction !== 'all' && trade.direction !== filters.direction) {
+        return false;
+    }
+
+    return true;
   });
 }
-
 
 function calculateStats(trades: Trade[]) {
   if (!trades || trades.length === 0) {
@@ -107,7 +135,7 @@ function calculateStats(trades: Trade[]) {
 
 
   const performanceData = trades
-    .slice() // Create a shallow copy to avoid mutating the original array
+    .slice() 
     .sort((a, b) => {
         const dateA = typeof a.date === 'string' ? new Date(a.date).getTime() : a.date.getTime();
         const dateB = typeof b.date === 'string' ? new Date(b.date).getTime() : b.date.getTime();
@@ -137,8 +165,6 @@ function calculateStats(trades: Trade[]) {
 
   trades.forEach(trade => {
     const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
-    // getDay() returns 0 for Sunday, 1 for Monday, etc.
-    // We adjust it to be Monday-first (0) to Saturday (5), Sunday (6)
     const dayIndex = (getDay(tradeDate) + 6) % 7;
      if (dayIndex >= 0 && dayIndex < 7) {
         weekdayPnl[dayIndex].pnl += trade.pnl;
@@ -146,7 +172,7 @@ function calculateStats(trades: Trade[]) {
   });
 
 
-  const weekdayPerformance = weekdayPnl.slice(0, 5); // Only show Mon-Fri
+  const weekdayPerformance = weekdayPnl.slice(0, 5); 
 
   return {
     totalPnl,
@@ -170,10 +196,14 @@ export default function DashboardPage() {
   const [user, loadingUser] = useAuthState(auth);
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   const [dateRange, setDateRange] = useState<DateRange>("all");
+  const [filters, setFilters] = useState({
+    asset: "all",
+    result: "all",
+    direction: "all",
+  });
 
   const tradesQuery = useMemo(() => {
     if (user) {
-      // ** REMOVED orderBy for client-side sorting **
       return query(collection(db, "trades"), where("userId", "==", user.uid));
     }
     return null;
@@ -188,11 +218,9 @@ export default function DashboardPage() {
         return {
             id: doc.id,
             ...data,
-            // Convert Firestore Timestamps to JS Date objects
             date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
         } as Trade;
       });
-      // Sort trades by date on the client side
       tradesData.sort((a, b) => b.date.getTime() - a.date.getTime());
       setAllTrades(tradesData);
     } else {
@@ -203,9 +231,19 @@ export default function DashboardPage() {
   if (error) {
     console.error("Error fetching trades:", error);
   }
+  
+  const handleFilterChange = (filterType: FilterType, value: string) => {
+    setFilters(prev => ({ ...prev, [filterType]: value }));
+  };
 
-  const filteredTrades = useMemo(() => filterTradesByDateRange(allTrades, dateRange), [allTrades, dateRange]);
+  const filteredTrades = useMemo(() => filterTrades(allTrades, dateRange, filters), [allTrades, dateRange, filters]);
   const stats = useMemo(() => calculateStats(filteredTrades), [filteredTrades]);
+  
+  const uniqueAssets = useMemo(() => {
+    const assets = new Set(allTrades.map(t => t.asset));
+    return Array.from(assets);
+  }, [allTrades]);
+
 
   const isLoading = loadingUser || loadingTrades;
 
@@ -260,7 +298,14 @@ export default function DashboardPage() {
               <div className="grid gap-4 md:gap-8">
                 <WeekdayPerformanceChart data={stats.weekdayPerformance} />
               </div>
-              <TradeTable trades={filteredTrades} />
+              <div>
+                <TradeFilters 
+                    uniqueAssets={uniqueAssets}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                />
+                <TradeTable trades={filteredTrades} />
+              </div>
             </>
           )}
         </div>
