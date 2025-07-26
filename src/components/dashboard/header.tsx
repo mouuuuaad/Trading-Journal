@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { CircleUser, Menu, Settings } from "lucide-react";
+import { CircleUser, Menu, Settings, FileSearch } from "lucide-react";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,15 @@ export function Header({ children }: HeaderProps) {
           <TradeVisionIcon className="h-6 w-6" />
           <span className="sr-only">TradeVision</span>
         </Link>
-        <h1 className="font-headline text-xl text-foreground">Dashboard</h1>
+        <Link href="/dashboard" className="text-foreground transition-colors hover:text-foreground/80">
+            <h1 className="font-headline text-xl text-foreground">Dashboard</h1>
+        </Link>
+         <Link
+          href="/dashboard/review"
+          className="text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Review
+        </Link>
       </nav>
       <Sheet>
         <SheetTrigger asChild>
@@ -81,6 +89,9 @@ export function Header({ children }: HeaderProps) {
             </Link>
             <Link href="/dashboard" className="hover:text-foreground">
               Dashboard
+            </Link>
+            <Link href="/dashboard/review" className="text-muted-foreground hover:text-foreground">
+              Review
             </Link>
              <Link
               href="/dashboard/settings"
@@ -115,6 +126,7 @@ export function Header({ children }: HeaderProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>{user?.displayName || user?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push('/dashboard/review')}>Review</DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>Settings</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />

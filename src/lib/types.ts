@@ -1,3 +1,4 @@
+
 export type Trade = {
   id: string;
   date: Date; // Changed to Date for easier sorting and filtering
@@ -11,4 +12,5 @@ export type Trade = {
   notes?: string;
   screenshotUrl?: string;
   userId: string;
+  postAnalysis?: string;
 };
