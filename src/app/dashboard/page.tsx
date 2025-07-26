@@ -10,6 +10,7 @@ import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { WinLossChart } from "@/components/dashboard/win-loss-chart";
+import { WeekdayPerformanceChart } from "@/components/dashboard/weekday-performance-chart";
 import { TradeTable } from "@/components/dashboard/trade-table";
 import { Trade } from "@/lib/types";
 import {
@@ -18,6 +19,7 @@ import {
   startOfMonth,
   startOfYear,
   parseISO,
+  getDay,
 } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExportButton } from "@/components/dashboard/export-button";
@@ -73,6 +75,7 @@ function calculateStats(trades: Trade[]) {
         { name: 'Losses', value: 0, fill: "hsl(var(--destructive))" },
         { name: 'Break Even', value: 0, fill: "hsl(var(--muted-foreground))" },
       ],
+      weekdayPerformance: [],
     };
   }
 
@@ -123,6 +126,28 @@ function calculateStats(trades: Trade[]) {
     { name: 'Break Even', value: beTrades, fill: "hsl(var(--muted-foreground))" },
   ];
 
+  const weekdayPnl = [
+    { name: 'Mon', pnl: 0 },
+    { name: 'Tue', pnl: 0 },
+    { name: 'Wed', pnl: 0 },
+    { name: 'Thu', pnl: 0 },
+    { name: 'Fri', pnl: 0 },
+    { name: 'Sat', pnl: 0 },
+    { name: 'Sun', pnl: 0 },
+  ];
+
+  trades.forEach(trade => {
+    // getDay() returns 0 for Sunday, 1 for Monday, etc.
+    // We adjust it to be Monday-first (0-6)
+    const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
+    const dayIndex = (getDay(tradeDate) + 6) % 7;
+    if (dayIndex >= 0 && dayIndex < 7) {
+        weekdayPnl[dayIndex].pnl += trade.pnl;
+    }
+  });
+
+  const weekdayPerformance = weekdayPnl.slice(0, 5); // Only show Mon-Fri
+
   return {
     totalPnl,
     winRate,
@@ -135,7 +160,8 @@ function calculateStats(trades: Trade[]) {
     bestTrade,
     worstTrade,
     performanceData,
-    winLossData
+    winLossData,
+    weekdayPerformance
   };
 }
 
@@ -228,9 +254,15 @@ export default function DashboardPage() {
                 </>
             )}
         </div>
+         <div className="grid gap-4 md:gap-8">
+            {isLoading ? (
+                <Skeleton className="h-[325px]" />
+            ) : (
+                <WeekdayPerformanceChart data={stats.weekdayPerformance} />
+            )}
+         </div>
          {isLoading ? <Skeleton className="h-96" /> : <TradeTable trades={filteredTrades} />}
       </main>
     </>
   );
 }
-
