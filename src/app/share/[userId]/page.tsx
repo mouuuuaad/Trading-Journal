@@ -152,8 +152,7 @@ function calculateStats(trades: Trade[]) {
 }
 
 
-export default function SharePage({ params }: { params: { userId: string } }) {
-  const { userId } = params;
+export default function SharePage({ params: { userId } }: { params: { userId: string } }) {
   const [userProfile, setUserProfile] = useState<{ uid: string; displayName: string; photoURL: string } | null>(null);
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   
