@@ -64,6 +64,9 @@ function calculateStats(trades: Trade[]) {
       beTrades: 0,
       totalTrades: 0,
       rrRatio: 0,
+      avgPnl: 0,
+      bestTrade: null,
+      worstTrade: null,
       performanceData: [],
       winLossData: [
         { name: 'Wins', value: 0, fill: "hsl(var(--chart-2))" },
@@ -95,6 +98,10 @@ function calculateStats(trades: Trade[]) {
   const averageRisk = losingTrades > 0 ? totalRisk / losingTrades : 0;
 
   const rrRatio = averageRisk > 0 ? averageReward / averageRisk : 0;
+  const avgPnl = totalTrades > 0 ? totalPnl / totalTrades : 0;
+
+  const bestTrade = trades.reduce((max, trade) => (trade.pnl > (max.pnl ?? -Infinity)) ? trade : max, trades[0]);
+  const worstTrade = trades.reduce((min, trade) => (trade.pnl < (min.pnl ?? Infinity)) ? trade : min, trades[0]);
 
 
   const performanceData = trades
@@ -124,6 +131,9 @@ function calculateStats(trades: Trade[]) {
     beTrades,
     totalTrades,
     rrRatio,
+    avgPnl,
+    bestTrade,
+    worstTrade,
     performanceData,
     winLossData
   };
@@ -181,7 +191,7 @@ export default function DashboardPage() {
       </Header>
       <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
         {isLoading ? (
-             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
                 <Skeleton className="h-28" />
                 <Skeleton className="h-28" />
                 <Skeleton className="h-28" />
@@ -196,6 +206,9 @@ export default function DashboardPage() {
               rrRatio={stats.rrRatio}
               dateRange={dateRange}
               setDateRange={setDateRange}
+              avgPnl={stats.avgPnl}
+              bestTrade={stats.bestTrade}
+              worstTrade={stats.worstTrade}
             />
         )}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
@@ -220,3 +233,4 @@ export default function DashboardPage() {
     </>
   );
 }
+
