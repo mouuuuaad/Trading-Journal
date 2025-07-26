@@ -141,10 +141,11 @@ function calculateStats(trades: Trade[]) {
     // We adjust it to be Monday-first (0-6)
     const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
     const dayIndex = (getDay(tradeDate) + 6) % 7;
-    if (dayIndex >= 0 && dayIndex < 7) {
+    if (dayIndex >= 0 && dayIndex < 7) { // Should always be true
         weekdayPnl[dayIndex].pnl += trade.pnl;
     }
   });
+
 
   const weekdayPerformance = weekdayPnl.slice(0, 5); // Only show Mon-Fri
 
@@ -217,12 +218,12 @@ export default function DashboardPage() {
       </Header>
       <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
         {isLoading ? (
-             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-            </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+          </div>
         ) : (
             <StatsCards
               totalPnl={stats.totalPnl}
@@ -237,31 +238,32 @@ export default function DashboardPage() {
               worstTrade={stats.worstTrade}
             />
         )}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
-            {isLoading ? (
-                <>
-                    <Skeleton className="lg:col-span-4 h-[325px]" />
-                    <Skeleton className="lg:col-span-3 h-[325px]" />
-                </>
-            ) : (
-                <>
-                    <div className="lg:col-span-4">
-                        <PerformanceChart data={stats.performanceData} />
-                    </div>
-                    <div className="lg:col-span-3">
-                        <WinLossChart data={stats.winLossData} />
-                    </div>
-                </>
-            )}
-        </div>
-         <div className="grid gap-4 md:gap-8">
-            {isLoading ? (
-                <Skeleton className="h-[325px]" />
-            ) : (
-                <WeekdayPerformanceChart data={stats.weekdayPerformance} />
-            )}
-         </div>
-         {isLoading ? <Skeleton className="h-96" /> : <TradeTable trades={filteredTrades} />}
+
+        {isLoading ? (
+          <div className="grid gap-4 md:gap-8">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+              <Skeleton className="lg:col-span-4 h-[325px]" />
+              <Skeleton className="lg:col-span-3 h-[325px]" />
+            </div>
+            <Skeleton className="h-[325px]" />
+            <Skeleton className="h-96" />
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
+              <div className="lg:col-span-4">
+                  <PerformanceChart data={stats.performanceData} />
+              </div>
+              <div className="lg:col-span-3">
+                  <WinLossChart data={stats.winLossData} />
+              </div>
+            </div>
+            <div className="grid gap-4 md:gap-8">
+              <WeekdayPerformanceChart data={stats.weekdayPerformance} />
+            </div>
+            <TradeTable trades={filteredTrades} />
+          </>
+        )}
       </main>
     </>
   );
