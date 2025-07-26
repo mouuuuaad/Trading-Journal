@@ -14,6 +14,7 @@ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import React from 'react';
 
 
 const loginSchema = z.object({
@@ -27,6 +28,7 @@ type LoginSchema = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
   });
@@ -45,6 +47,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
@@ -55,6 +58,8 @@ export default function LoginPage() {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+        setIsGoogleLoading(false);
     }
   };
 
@@ -70,15 +75,15 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" {...register("email")} disabled={isSubmitting} />
+              <Input id="email" type="email" placeholder="m@example.com" {...register("email")} disabled={isSubmitting || isGoogleLoading} />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register("password")} disabled={isSubmitting}/>
+              <Input id="password" type="password" {...register("password")} disabled={isSubmitting || isGoogleLoading}/>
               {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
             </div>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="w-full" disabled={isSubmitting || isGoogleLoading}>
               {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </form>
@@ -92,8 +97,8 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
-            <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn} disabled={isSubmitting}>
-              Sign in with Google
+            <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn} disabled={isSubmitting || isGoogleLoading}>
+              {isGoogleLoading ? "Signing in..." : "Sign in with Google"}
             </Button>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
