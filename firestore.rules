@@ -3,12 +3,13 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Public read access for the share page, but only for queries that filter by userId.
-    // This prevents anyone from listing all trades for all users.
-    // Write access is still restricted to the owner of the trades.
+    // Rules for the 'trades' collection
     match /trades/{tradeId} {
-      allow get: if true;
-      allow list: if query.filters.size() == 1 && 'userId' in query.filters[0];
+      // Anyone can read (get, list) the trade data.
+      // This is necessary for the public sharing page to query trades by userId.
+      allow read: if true;
+
+      // Only the authenticated user who owns the trade can write (create, update, delete).
       allow write: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
   }
