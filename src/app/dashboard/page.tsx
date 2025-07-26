@@ -154,31 +154,21 @@ function calculateStats(trades: Trade[]) {
   ];
   
   const weekdayPnl = [
-    { name: 'Sun', pnl: 0 },
     { name: 'Mon', pnl: 0 },
     { name: 'Tue', pnl: 0 },
     { name: 'Wed', pnl: 0 },
     { name: 'Thu', pnl: 0 },
     { name: 'Fri', pnl: 0 },
-    { name: 'Sat', pnl: 0 },
   ];
 
   trades.forEach(trade => {
     const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
     const dayIndex = getDay(tradeDate); // 0 (Sunday) to 6 (Saturday)
-    if (dayIndex >= 0 && dayIndex < 7) {
-        weekdayPnl[dayIndex].pnl += trade.pnl;
+    if (dayIndex >= 1 && dayIndex <= 5) { // Monday to Friday
+        weekdayPnl[dayIndex - 1].pnl += trade.pnl;
     }
   });
 
-  // Reorder to Mon-Fri and exclude weekends if they have no data
-  const weekdayPerformance = [
-      weekdayPnl[1], // Mon
-      weekdayPnl[2], // Tue
-      weekdayPnl[3], // Wed
-      weekdayPnl[4], // Thu
-      weekdayPnl[5], // Fri
-  ];
 
   return {
     totalPnl,
@@ -193,7 +183,7 @@ function calculateStats(trades: Trade[]) {
     worstTrade,
     performanceData,
     winLossData,
-    weekdayPerformance
+    weekdayPerformance: weekdayPnl
   };
 }
 
@@ -319,3 +309,5 @@ export default function DashboardPage() {
     </>
   );
 }
+
+    
