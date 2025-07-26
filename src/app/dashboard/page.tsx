@@ -152,27 +152,33 @@ function calculateStats(trades: Trade[]) {
     { name: 'Losses', value: losingTrades, fill: "hsl(var(--destructive))" },
     { name: 'Break Even', value: beTrades, fill: "hsl(var(--muted-foreground))" },
   ];
-
+  
   const weekdayPnl = [
+    { name: 'Sun', pnl: 0 },
     { name: 'Mon', pnl: 0 },
     { name: 'Tue', pnl: 0 },
     { name: 'Wed', pnl: 0 },
     { name: 'Thu', pnl: 0 },
     { name: 'Fri', pnl: 0 },
     { name: 'Sat', pnl: 0 },
-    { name: 'Sun', pnl: 0 },
   ];
 
   trades.forEach(trade => {
     const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
-    const dayIndex = (getDay(tradeDate) + 6) % 7;
-     if (dayIndex >= 0 && dayIndex < 7) {
+    const dayIndex = getDay(tradeDate); // 0 (Sunday) to 6 (Saturday)
+    if (dayIndex >= 0 && dayIndex < 7) {
         weekdayPnl[dayIndex].pnl += trade.pnl;
     }
   });
 
-
-  const weekdayPerformance = weekdayPnl.slice(0, 5); 
+  // Reorder to Mon-Fri and exclude weekends if they have no data
+  const weekdayPerformance = [
+      weekdayPnl[1], // Mon
+      weekdayPnl[2], // Tue
+      weekdayPnl[3], // Wed
+      weekdayPnl[4], // Thu
+      weekdayPnl[5], // Fri
+  ];
 
   return {
     totalPnl,
