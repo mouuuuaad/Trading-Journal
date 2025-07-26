@@ -3,9 +3,10 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /trades/{tradeId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    // Allow public read access for the share page, but restrict writes to the owner.
+    match /trades/{document=**} {
+      allow get, list: if true;
+      allow create, update, delete: if request.auth != null && request.auth.uid == request.resource.data.userId;
     }
   }
 }
