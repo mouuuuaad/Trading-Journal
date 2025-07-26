@@ -1,3 +1,7 @@
+
+"use client";
+
+import * as React from "react";
 import {
   Table,
   TableBody,
@@ -26,13 +30,23 @@ import { MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Trade } from "@/lib/types";
 import { format } from "date-fns";
+import { TradeDetailsModal } from "./trade-details-modal";
 
 interface TradeTableProps {
     trades: Trade[];
 }
 
 export function TradeTable({ trades }: TradeTableProps) {
+  const [selectedTrade, setSelectedTrade] = React.useState<Trade | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+  const handleViewDetails = (trade: Trade) => {
+    setSelectedTrade(trade);
+    setIsModalOpen(true);
+  };
+
   return (
+    <>
     <Card>
       <CardHeader className="px-4 pt-4 sm:px-6 sm:pt-6">
         <CardTitle className="font-headline">Recent Trades</CardTitle>
@@ -103,7 +117,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleViewDetails(trade)}>View Details</DropdownMenuItem>
                             <DropdownMenuItem>Edit</DropdownMenuItem>
                             <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">Delete</DropdownMenuItem>
                           </DropdownMenuContent>
@@ -121,5 +135,15 @@ export function TradeTable({ trades }: TradeTableProps) {
         </div>
       </CardContent>
     </Card>
+    {selectedTrade && (
+        <TradeDetailsModal
+            isOpen={isModalOpen}
+            onOpenChange={setIsModalOpen}
+            trade={selectedTrade}
+        />
+    )}
+    </>
   );
 }
+
+    

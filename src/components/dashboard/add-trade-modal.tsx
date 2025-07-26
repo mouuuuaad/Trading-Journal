@@ -33,18 +33,12 @@ import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { Textarea } from "../ui/textarea";
 
 const popularAssets = [
   "EUR/USD", "GBP/USD", "USD/JPY", "USD/CAD", "AUD/USD",
   "XAU/USD (Gold)", "USO/USD (Oil)", "BTC/USD", "ETH/USD", "SPX500"
 ];
-
-const commonNotes = [
-  "Trend Following", "Breakout Strategy", "Range Trading", "Reversal Pattern",
-  "Support/Resistance Bounce", "News Catalyst", "Technical Divergence",
-  "High Volume Confirmation", "Risk Management Adjustment", "Gut Feeling"
-];
-
 
 const tradeSchema = z.object({
   asset: z.string().min(1, "Asset is required"),
@@ -249,22 +243,18 @@ export function AddTradeModal() {
                 )}
               />
             </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="notes" className="text-right">Notes</Label>
+             <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="notes" className="text-right pt-2">Notes</Label>
               <Controller
                 name="notes"
                 control={control}
                 render={({ field }) => (
-                   <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select a trade rationale" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {commonNotes.map(note => (
-                        <SelectItem key={note} value={note}>{note}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Textarea
+                    id="notes"
+                    placeholder="Enter your thoughts on the trade, strategy, emotions, etc."
+                    className="col-span-3"
+                    {...field}
+                  />
                 )}
               />
             </div>
@@ -280,3 +270,5 @@ export function AddTradeModal() {
     </Dialog>
   );
 }
+
+    
