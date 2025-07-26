@@ -12,10 +12,29 @@ import {
 import { auth } from "@/lib/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
-import { Loader2, Mail, Instagram, Phone } from "lucide-react";
+import { Loader2, Mail, Phone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { TradeVisionIcon } from "@/components/icons";
+
+const TelegramIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M22 2L11 13" />
+        <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+    </svg>
+);
+
 
 export default function GuestPage() {
   const [user, loading] = useAuthState(auth);
@@ -71,15 +90,15 @@ export default function GuestPage() {
                         </Link>
                      </Button>
                       <Button asChild variant="outline" className="w-full justify-start gap-4">
-                        <Link href="https://wa.me/212721009527" target="_blank">
+                        <Link href="tel:+212721009527" target="_blank">
                             <Phone className="h-5 w-5 text-primary" />
-                            <span>+212 721-009527 (WhatsApp)</span>
+                            <span>+212 721-009527 (No WhatsApp)</span>
                         </Link>
                      </Button>
                       <Button asChild variant="outline" className="w-full justify-start gap-4">
-                        <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank">
-                            <Instagram className="h-5 w-5 text-primary" />
-                            <span>@mouuuuaad_dev</span>
+                        <Link href="https://t.me/MouuZ4" target="_blank">
+                            <TelegramIcon className="h-5 w-5 text-primary" />
+                            <span>@MouuZ4</span>
                         </Link>
                      </Button>
                 </CardContent>
