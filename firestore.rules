@@ -1,16 +1,24 @@
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Public read access for the share page, secure write access for users.
+    // Rules for the trades collection
     match /trades/{tradeId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      // Allow anyone to get a single document if they have the ID.
+      allow get: if true;
+
+      // Allow only the authenticated owner to create, update, or delete their own documents.
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    // This rule is crucial for the public share page.
+    // It allows anyone to perform a query (like `where('userId', '==', ...)` on the trades collection.
+    match /trades/{document=**} {
+       allow list: if true;
     }
 
-    // Secure user-specific settings
+    // Rules for user settings, only the user can manage their own settings.
     match /userSettings/{userId} {
-       allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
