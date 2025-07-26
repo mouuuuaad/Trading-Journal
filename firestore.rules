@@ -1,22 +1,16 @@
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Rules for the 'trades' collection
+    // Deny all reads and writes by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Allow users to read and write only their own trades
     match /trades/{tradeId} {
-
-      // Allow anyone to read any document in the trades collection.
-      // This is necessary for the public sharing feature to work, as Firestore
-      // needs permission to access the document before it can check any
-      // fields like 'shared == true'.
-      // Security is maintained by keeping write access private and by your
-      // app only generating links to specific, shared trade IDs.
-      allow read: if true;
-
-      // Allow users to create, update, or delete a trade only if they are
-      // authenticated and their UID matches the 'userId' field in the document.
-      // For 'create', it checks the incoming document's data.
-      // For 'update' and 'delete', it checks the existing document's data.
-      allow write: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
     }
   }
 }

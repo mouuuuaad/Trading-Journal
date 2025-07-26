@@ -10,9 +10,6 @@ import {
   where,
   getDocs,
   writeBatch,
-  doc,
-  setDoc,
-  getDoc,
 } from "firebase/firestore";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,8 +46,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/dashboard/header";
-import { Switch } from "@/components/ui/switch";
-import { Copy, Loader2, RefreshCw } from "lucide-react";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -64,11 +59,6 @@ export default function SettingsPage() {
   const [user] = useAuthState(auth);
   const { toast } = useToast();
   const { setTheme, theme } = useTheme();
-  const [isShareEnabled, setIsShareEnabled] = React.useState(false);
-  const [publicProfileUrl, setPublicProfileUrl] = React.useState('');
-  const [isGeneratingLink, setIsGeneratingLink] = React.useState(false);
-  const [isSavingPrefs, setIsSavingPrefs] = React.useState(false);
-
 
   const {
     register,
@@ -85,17 +75,6 @@ export default function SettingsPage() {
   React.useEffect(() => {
     if (user?.displayName) {
       reset({ name: user.displayName });
-    }
-     if (user) {
-      const fetchSharingSettings = async () => {
-        const userSettingsRef = doc(db, 'userSettings', user.uid);
-        const docSnap = await getDoc(userSettingsRef);
-        if (docSnap.exists()) {
-          const settings = docSnap.data();
-          setIsShareEnabled(settings.isShareEnabled || false);
-        }
-      };
-      fetchSharingSettings();
     }
   }, [user, reset]);
 
@@ -160,59 +139,6 @@ export default function SettingsPage() {
     }
   };
 
-  const generateShareLink = () => {
-    if (!user) return;
-    setIsGeneratingLink(true);
-    const timestamp = new Date().getTime();
-    const url = `${window.location.origin}/share/${user.uid}?ts=${timestamp}`;
-    setPublicProfileUrl(url);
-     setTimeout(() => setIsGeneratingLink(false), 500); // Simulate generation time
-     toast({
-        title: "Link Generated",
-        description: "Your secure, one-hour link is ready.",
-    });
-  };
-
-  const copyPublicUrl = () => {
-    if (!publicProfileUrl) {
-         toast({
-            title: "No link to copy",
-            description: "Please generate a link first.",
-            variant: "destructive",
-        });
-        return;
-    }
-    navigator.clipboard.writeText(publicProfileUrl);
-    toast({
-        title: "Copied to clipboard!",
-        description: "Your public profile URL has been copied.",
-    });
-  };
-  
-   const handleSaveSharingPreferences = async () => {
-    if (!user) return;
-    setIsSavingPrefs(true);
-    try {
-      const userSettingsRef = doc(db, 'userSettings', user.uid);
-      await setDoc(userSettingsRef, { isShareEnabled }, { merge: true });
-      toast({
-        title: "Preferences Saved",
-        description: "Your sharing settings have been updated.",
-      });
-       if (!isShareEnabled) {
-        setPublicProfileUrl(''); // Clear the URL if sharing is disabled
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error Saving Preferences",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSavingPrefs(false);
-    }
-  };
-
 
   return (
     <>
@@ -223,11 +149,10 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Manage your account, appearance, and data.</p>
       </div>
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full max-w-lg grid-cols-4">
+        <TabsList className="grid w-full max-w-lg grid-cols-3">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="data">Data</TabsTrigger>
-          <TabsTrigger value="sharing">Sharing</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
           <Card>
@@ -359,50 +284,6 @@ export default function SettingsPage() {
                 </AlertDialog>
               </div>
             </CardContent>
-          </Card>
-        </TabsContent>
-         <TabsContent value="sharing">
-          <Card>
-            <CardHeader>
-              <CardTitle>Public Profile Sharing</CardTitle>
-              <CardDescription>
-                Generate a secure, time-sensitive link to share a read-only version of your trading dashboard.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="flex items-center justify-between rounded-lg border p-4">
-                    <div>
-                        <h3 className="font-semibold">Enable Public Profile</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Allow your profile to be viewed by others via a secure link.
-                        </p>
-                    </div>
-                    <Switch checked={isShareEnabled} onCheckedChange={setIsShareEnabled} />
-                </div>
-                 <div className="space-y-2 pt-4">
-                    <Label htmlFor="public-url">Your Secure Share Link (Expires in 1 hour)</Label>
-                    <div className="flex gap-2">
-                        <Input id="public-url" value={publicProfileUrl} readOnly placeholder="Generate a link to share your profile" />
-                        <Button variant="secondary" onClick={copyPublicUrl} disabled={!publicProfileUrl}>
-                            <Copy className="h-4 w-4" />
-                        </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                        For security, this link is only valid for one hour from the moment it is generated.
-                    </p>
-                </div>
-                 <div className="flex justify-start">
-                     <Button onClick={generateShareLink} disabled={!isShareEnabled || isGeneratingLink}>
-                        {isGeneratingLink ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
-                        {isGeneratingLink ? "Generating..." : "Generate New Link"}
-                    </Button>
-                 </div>
-            </CardContent>
-             <CardFooter className="border-t px-6 py-4">
-                <Button onClick={handleSaveSharingPreferences} disabled={isSavingPrefs}>
-                    {isSavingPrefs ? "Saving..." : "Save Sharing Preferences"}
-                </Button>
-              </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
