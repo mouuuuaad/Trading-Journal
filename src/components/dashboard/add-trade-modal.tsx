@@ -49,6 +49,7 @@ const tradeSchema = z.object({
   result: z.enum(["Win", "Loss", "BE"]),
   date: z.date(),
   notes: z.string().optional(),
+  screenshotUrl: z.string().url().optional().or(z.literal('')),
 });
 
 type TradeFormValues = z.infer<typeof tradeSchema>;
@@ -68,6 +69,7 @@ export function AddTradeModal() {
       result: "Win",
       date: new Date(),
       notes: "",
+      screenshotUrl: "",
     },
   });
 
@@ -82,24 +84,16 @@ export function AddTradeModal() {
     
     if (data.result === 'Win') {
         const reward = Math.abs(data.takeProfit - data.entryPrice);
-        pnl = data.direction === 'Buy' ? reward : reward; // PnL is positive for wins
+        pnl = data.direction === 'Buy' ? reward : reward;
     } else if (data.result === 'Loss') {
-        pnl = -risk; // PnL is negative for losses
+        pnl = -risk;
     }
-    // For 'BE', PnL remains 0
 
     try {
       await addDoc(collection(db, "trades"), {
         userId: user.uid,
-        asset: data.asset,
-        direction: data.direction,
-        entryPrice: data.entryPrice,
-        stopLoss: data.stopLoss,
-        takeProfit: data.takeProfit,
-        result: data.result,
-        notes: data.notes,
+        ...data,
         pnl,
-        date: data.date, // Storing as a Firebase Timestamp for better querying
       });
 
       toast({
@@ -243,6 +237,22 @@ export function AddTradeModal() {
                 )}
               />
             </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="screenshotUrl" className="text-right pt-2">Screenshot URL</Label>
+                <Controller
+                    name="screenshotUrl"
+                    control={control}
+                    render={({ field }) => (
+                    <Input
+                        id="screenshotUrl"
+                        placeholder="https://example.com/image.png"
+                        className="col-span-3"
+                        {...field}
+                    />
+                    )}
+                />
+                {errors.screenshotUrl && <p className="col-span-4 text-right text-sm text-destructive">{errors.screenshotUrl.message}</p>}
+            </div>
              <div className="grid grid-cols-4 items-start gap-4">
               <Label htmlFor="notes" className="text-right pt-2">Notes</Label>
               <Controller
@@ -270,5 +280,3 @@ export function AddTradeModal() {
     </Dialog>
   );
 }
-
-    

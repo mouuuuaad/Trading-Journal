@@ -12,6 +12,7 @@ import { Trade } from "@/lib/types";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "../ui/badge";
+import Image from "next/image";
 
 interface TradeDetailsModalProps {
   isOpen: boolean;
@@ -47,6 +48,15 @@ export function TradeDetailsModal({ isOpen, onOpenChange, trade }: TradeDetailsM
             <DetailRow label="Result" value={<Badge variant={trade.result === "Win" ? "default" : trade.result === "Loss" ? "destructive" : "secondary"} className={cn("w-[50px] justify-center", trade.result === 'Win' ? 'bg-accent text-accent-foreground hover:bg-accent/80' : '')}>{trade.result}</Badge>} />
             <DetailRow label="P/L" value={`$${trade.pnl.toFixed(2)}`} valueClassName={trade.pnl >= 0 ? "text-accent" : "text-destructive"} />
             
+            {trade.screenshotUrl && (
+                 <div className="space-y-2 pt-4">
+                    <h4 className="font-medium text-sm text-foreground">Screenshot</h4>
+                    <div className="p-2 border rounded-md">
+                       <img src={trade.screenshotUrl} alt={`Screenshot for ${trade.asset} trade`} className="w-full h-auto rounded-md object-contain" />
+                    </div>
+                </div>
+            )}
+
             {trade.notes && (
                 <div className="space-y-2 pt-4">
                     <h4 className="font-medium text-sm text-foreground">Personal Notes</h4>
@@ -60,5 +70,3 @@ export function TradeDetailsModal({ isOpen, onOpenChange, trade }: TradeDetailsM
     </Dialog>
   );
 }
-
-    

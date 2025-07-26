@@ -9,5 +9,6 @@ export type Trade = {
   result: 'Win' | 'Loss' | 'BE';
   pnl: number;
   notes?: string;
+  screenshotUrl?: string;
   userId: string;
 };
