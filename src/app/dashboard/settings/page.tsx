@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -45,6 +46,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/dashboard/header";
+import { Switch } from "@/components/ui/switch";
+import { Copy } from "lucide-react";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -138,6 +141,16 @@ export default function SettingsPage() {
     }
   };
 
+  const publicProfileUrl = user ? `${window.location.origin}/share/${user.uid}` : '';
+
+  const copyPublicUrl = () => {
+    navigator.clipboard.writeText(publicProfileUrl);
+    toast({
+        title: "Copied to clipboard!",
+        description: "Your public profile URL has been copied.",
+    });
+  };
+
   return (
     <>
     <Header/>
@@ -147,10 +160,11 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Manage your account, appearance, and data.</p>
       </div>
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
+        <TabsList className="grid w-full max-w-lg grid-cols-4">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="data">Data</TabsTrigger>
+          <TabsTrigger value="sharing">Sharing</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
           <Card>
@@ -282,6 +296,39 @@ export default function SettingsPage() {
                 </AlertDialog>
               </div>
             </CardContent>
+          </Card>
+        </TabsContent>
+         <TabsContent value="sharing">
+          <Card>
+            <CardHeader>
+              <CardTitle>Public Profile</CardTitle>
+              <CardDescription>
+                Share a read-only version of your trading dashboard.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div>
+                        <h3 className="font-semibold">Enable Public Profile</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Anyone with the link will be able to view your shared stats.
+                        </p>
+                    </div>
+                    <Switch />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="public-url">Your Public URL</Label>
+                    <div className="flex gap-2">
+                    <Input id="public-url" value={publicProfileUrl} readOnly />
+                    <Button variant="secondary" onClick={copyPublicUrl}>
+                        <Copy className="h-4 w-4" />
+                    </Button>
+                    </div>
+                </div>
+            </CardContent>
+             <CardFooter className="border-t px-6 py-4">
+                <Button>Save Sharing Preferences</Button>
+              </CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
