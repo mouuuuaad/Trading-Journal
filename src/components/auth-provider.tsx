@@ -17,37 +17,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (loading) {
-      return; // Wait for authentication state to load
-    }
+    if (loading) return; // Wait until the auth state is determined
 
-    const isPublicRoute = publicRoutes.includes(pathname);
     const isPrivateRoute = pathname.startsWith(privateRoutePrefix);
-    const isAuthorized = user && authorizedUsers.includes(user.email || "");
+    const isGuestRoute = pathname === '/guest';
+    const isPublicRoute = publicRoutes.includes(pathname);
 
     if (user) {
+      const isAuthorized = authorizedUsers.includes(user.email || "");
+
       if (isAuthorized) {
-        if (isPublicRoute && pathname !== '/guest') {
-           // Authorized user on a public page (like login), send to their dashboard
-           router.push('/dashboard');
+        // Authorized user should be on the dashboard.
+        // If they are on a public page (like /login) or the guest page, redirect them.
+        if (!isPrivateRoute) {
+          router.replace('/dashboard');
         }
       } else {
-        // User is logged in but NOT authorized
-        if (pathname !== '/guest') {
-          // Send them to the guest page
-          router.push('/guest');
+        // Unauthorized user should be on the guest page.
+        // If they are anywhere else, redirect them.
+        if (!isGuestRoute) {
+          router.replace('/guest');
         }
       }
     } else {
-       // User is not logged in
-       if (isPrivateRoute) {
-         // Trying to access a private route without being logged in, send to login
-         router.push('/login');
-       }
+      // No user is logged in.
+      // If they try to access a private route, send them to the login page.
+      if (isPrivateRoute) {
+        router.replace('/login');
+      }
     }
-
   }, [user, loading, router, pathname]);
 
+  // While loading, or if a redirect is imminent, show a loader or nothing to prevent content flashing.
   if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -56,16 +57,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Prevent rendering children until redirect has a chance to happen
-  const isAuthorized = user && authorizedUsers.includes(user.email || "");
-  if (user && publicRoutes.includes(pathname) && isAuthorized && pathname !== '/guest') {
-      return null;
-  }
-   if (user && !isAuthorized && pathname !== '/guest') {
-      return null;
-  }
-  if (!user && !publicRoutes.includes(pathname)) {
-    return null;
+  // This logic prevents rendering the wrong layout while a redirect is in progress.
+  if (user) {
+      const isAuthorized = authorizedUsers.includes(user.email || "");
+      if (isAuthorized && !pathname.startsWith(privateRoutePrefix)) return null;
+      if (!isAuthorized && pathname !== '/guest') return null;
+  } else {
+      if (pathname.startsWith(privateRoutePrefix)) return null;
   }
 
 
