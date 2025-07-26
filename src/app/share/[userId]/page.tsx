@@ -2,44 +2,55 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, query, where, getDocs, doc } from "firebase/firestore";
+import { collection, query, where, getDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Trade } from "@/lib/types";
 import {
-  startOfToday,
-  startOfWeek,
-  startOfMonth,
-  startOfYear,
   parseISO,
   getDay,
 } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { StatsCards } from "@/components/dashboard/stats-cards";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { WinLossChart } from "@/components/dashboard/win-loss-chart";
 import { WeekdayPerformanceChart } from "@/components/dashboard/weekday-performance-chart";
 import { TradeTable } from "@/components/dashboard/trade-table";
-import { TradeVisionIcon } from "@/components/icons";
-import Link from "next/link";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AlertCircle } from "lucide-react";
 
 
-// NOTE: In a real app, you would fetch user profile data from Firestore
-// based on the userId, not just rely on auth state.
-// This is a placeholder for demonstration.
 const getPublicUserProfile = async (userId: string) => {
     // This is a simplified version. In a real app, you'd query a 'users'
     // collection where you store public profile data.
-    // For now, we'll try to get it from existing trades if possible,
-    // or just use the ID.
-    return {
+    const userSettingsRef = doc(db, 'userSettings', userId);
+    const docSnap = await getDoc(userSettingsRef);
+    if (docSnap.exists() && docSnap.data().isShareEnabled) {
+         return {
+            uid: userId,
+            displayName: `User ${userId.substring(0, 6)}...`, // Placeholder name
+            photoURL: `https://avatar.vercel.sh/${userId}.png`,
+            isShareEnabled: true,
+        };
+    }
+    // A more robust solution would be to query the `users` collection in Firestore.
+    // For now, we will simulate this with a placeholder.
+    // We also need to get the real display name, which isn't stored on the trade docs.
+    // This will require a separate 'users' collection lookup in a real app.
+     const tradesQuery = query(collection(db, "trades"), where("userId", "==", userId));
+     const tradesSnap = await getDoc(tradesQuery as any); // Type assertion for simplicity
+     if (!tradesSnap.empty) {
+        // This is not ideal as it doesn't have the user's name, just their ID
+        // In a real app, you'd have a `users` collection.
+        // We'll use a placeholder name.
+     }
+      return {
         uid: userId,
         displayName: `User ${userId.substring(0, 6)}...`,
         photoURL: `https://avatar.vercel.sh/${userId}.png`,
+        isShareEnabled: docSnap.exists() ? docSnap.data().isShareEnabled : false
     };
 };
 
@@ -115,13 +126,13 @@ function calculateStats(trades: Trade[]) {
   ];
   
   const weekdayPnl = [
-    { name: 'Mon', pnl: 0, wins: 0, losses: 0, be: 0 },
-    { name: 'Tue', pnl: 0, wins: 0, losses: 0, be: 0 },
-    { name: 'Wed', pnl: 0, wins: 0, losses: 0, be: 0 },
-    { name: 'Thu', pnl: 0, wins: 0, losses: 0, be: 0 },
-    { name: 'Fri', pnl: 0, wins: 0, losses: 0, be: 0 },
-    { name: 'Sat', pnl: 0, wins: 0, losses: 0, be: 0 },
-    { name: 'Sun', pnl: 0, wins: 0, losses: 0, be: 0 },
+    { name: 'Mon', pnl: 0 },
+    { name: 'Tue', pnl: 0 },
+    { name: 'Wed', pnl: 0 },
+    { name: 'Thu', pnl: 0 },
+    { name: 'Fri', pnl: 0 },
+    { name: 'Sat', pnl: 0 },
+    { name: 'Sun', pnl: 0 },
   ];
 
   trades.forEach(trade => {
@@ -152,13 +163,28 @@ function calculateStats(trades: Trade[]) {
   };
 }
 
+const ExpirationNotice = () => (
+    <Card className="max-w-2xl mx-auto mt-10">
+        <CardHeader className="text-center">
+            <AlertCircle className="mx-auto h-16 w-16 text-destructive" />
+            <CardTitle className="mt-4 font-headline text-2xl text-destructive">Link Expired</CardTitle>
+        </CardHeader>
+        <CardContent className="text-center">
+            <p className="text-muted-foreground">For security reasons, this public sharing link was only valid for one hour.</p>
+            <p className="mt-2">Please ask the user to generate a new link.</p>
+        </CardContent>
+    </Card>
+)
 
 export default function SharePage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const userId = params.userId as string;
+  const timestamp = searchParams.get('ts');
 
-  const [userProfile, setUserProfile] = useState<{ uid: string; displayName: string; photoURL: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ uid: string; displayName: string; photoURL: string, isShareEnabled: boolean } | null>(null);
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
+  const [isLinkValid, setIsLinkValid] = useState<boolean | null>(null);
   
   const tradesQuery = useMemo(() => {
     if (userId) {
@@ -170,16 +196,33 @@ export default function SharePage() {
   const [tradesSnapshot, loadingTrades, error] = useCollection(tradesQuery);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-        if(userId) {
-            const profile = await getPublicUserProfile(userId);
-            setUserProfile(profile);
+    const validateLinkAndFetchData = async () => {
+        if (!userId || !timestamp) {
+            setIsLinkValid(false);
+            return;
         }
+
+        const linkTime = parseInt(timestamp, 10);
+        const now = new Date().getTime();
+        const oneHour = 60 * 60 * 1000;
+
+        if (now - linkTime > oneHour) {
+            setIsLinkValid(false);
+            return;
+        }
+
+        const profile = await getPublicUserProfile(userId);
+        if (!profile.isShareEnabled) {
+            setIsLinkValid(false);
+            return;
+        }
+        
+        setUserProfile(profile);
+        setIsLinkValid(true);
     };
-    if (userId) {
-      fetchProfile();
-    }
-  }, [userId])
+    
+    validateLinkAndFetchData();
+  }, [userId, timestamp]);
 
   useEffect(() => {
     if (tradesSnapshot) {
@@ -200,12 +243,11 @@ export default function SharePage() {
 
   if (error) {
     console.error("Error fetching trades:", error);
-    // You could show an error message to the user
   }
 
   const stats = useMemo(() => calculateStats(allTrades), [allTrades]);
   
-  const isLoading = loadingTrades || !userProfile;
+  const isLoading = loadingTrades || userProfile === null || isLinkValid === null;
 
   const getInitials = (name: string | null | undefined) => {
     if (!name) return "?";
@@ -224,12 +266,14 @@ export default function SharePage() {
         disableTransitionOnChange
     >
     <main className="flex-1 space-y-4 p-4 sm:p-6 md:p-8">
-        {isLoading || !userId ? (
+        {isLoading ? (
             <div className="max-w-5xl mx-auto space-y-8">
                 <Skeleton className="h-24 w-full" />
                 <Skeleton className="h-28 w-full" />
                 <Skeleton className="h-80 w-full" />
             </div>
+        ) : !isLinkValid ? (
+            <ExpirationNotice />
         ) : allTrades.length === 0 ? (
             <Card className="max-w-5xl mx-auto flex flex-col items-center justify-center text-center py-20">
                 <CardHeader>
