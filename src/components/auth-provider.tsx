@@ -21,7 +21,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const isPrivateRoute = pathname.startsWith(privateRoutePrefix);
     const isGuestRoute = pathname === '/guest';
-    const isPublicRoute = publicRoutes.includes(pathname);
 
     if (user) {
       const isAuthorized = authorizedUsers.includes(user.email || "");
@@ -58,12 +57,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // This logic prevents rendering the wrong layout while a redirect is in progress.
+  // It ensures that we don't show a public page to a logged-in user, or a private page to a logged-out user.
   if (user) {
       const isAuthorized = authorizedUsers.includes(user.email || "");
-      if (isAuthorized && !pathname.startsWith(privateRoutePrefix)) return null;
-      if (!isAuthorized && pathname !== '/guest') return null;
+      if (isAuthorized && !pathname.startsWith(privateRoutePrefix)) return (
+        <div className="flex h-screen w-full items-center justify-center bg-background">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+      );
+      if (!isAuthorized && pathname !== '/guest') return (
+         <div className="flex h-screen w-full items-center justify-center bg-background">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+      );
   } else {
-      if (pathname.startsWith(privateRoutePrefix)) return null;
+      if (pathname.startsWith(privateRoutePrefix)) return (
+         <div className="flex h-screen w-full items-center justify-center bg-background">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+      );
   }
 
 
