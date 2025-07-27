@@ -1,11 +1,10 @@
-// src/lib/firebase-admin.ts
+
+import { NextResponse } from 'next/server';
 import admin from 'firebase-admin';
-import type { ServiceAccount } from 'firebase-admin';
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 // This is a sensitive file and should not be exposed to the client.
-// The service account key is now directly in the code for simplicity in development.
-// In production, this should always be an environment variable.
-const serviceAccount: ServiceAccount = {
+const serviceAccount = {
   "type": "service_account",
   "project_id": "compass-6b774",
   "private_key_id": "b43bd14130e1b036aeeb4a6c2b3d01b93c16c030",
@@ -19,13 +18,57 @@ const serviceAccount: ServiceAccount = {
   "universe_domain": "googleapis.com"
 };
 
+// Initialize Firebase Admin SDK
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccount)
   });
 }
 
 const db = admin.firestore();
 const auth = admin.auth();
 
-export { db, auth };
+export async function GET(request: Request, { params }: { params: { userId: string } }) {
+  const { userId } = params;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+  }
+
+  try {
+    // 1. Fetch User Data
+    let userData = { displayName: "Anonymous User", photoURL: "" };
+    try {
+        const userRecord = await auth.getUser(userId);
+        userData = {
+            displayName: userRecord.displayName || "Anonymous User",
+            photoURL: userRecord.photoURL || ""
+        };
+    } catch (error) {
+        console.warn(`Could not fetch user data for ${userId}:`, error);
+        // We can still proceed and show trades for an "Anonymous User"
+    }
+
+    // 2. Fetch Trades
+    const tradesQuery = query(
+      collection(db, "trades"),
+      where("userId", "==", userId)
+    );
+    const tradesSnapshot = await getDocs(tradesQuery);
+
+    const trades = tradesSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        date: data.date.toDate().toISOString(), // Serialize date to ISO string
+      };
+    });
+
+    return NextResponse.json({ user: userData, trades });
+
+  } catch (error) {
+    console.error(`Error fetching share data for ${userId}:`, error);
+    return NextResponse.json({ error: 'A server error occurred while fetching the share data.' }, { status: 500 });
+  }
+}
