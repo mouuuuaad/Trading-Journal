@@ -9,25 +9,32 @@ function NewsTimelineWidget() {
   const { theme } = useTheme();
 
   useEffect(() => {
-    if (container.current && container.current.children.length === 0) {
-      const script = document.createElement("script");
-      script.src = "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js";
-      script.type = "text/javascript";
-      script.async = true;
+    if (container.current) {
+        container.current.innerHTML = '';
+    }
+    
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-timeline.js";
+    script.type = "text/javascript";
+    script.async = true;
 
-      const widgetConfig = {
-          "feedMode": "all_symbols",
-          "isTransparent": true,
-          "displayMode": "regular",
-          "width": "100%",
-          "height": "100%",
-          "colorTheme": theme === 'light' ? 'light' : 'dark',
-          "locale": "en"
-      };
+    const currentTheme = theme === "system" ? window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" : theme;
 
-      script.innerHTML = JSON.stringify(widgetConfig);
+    const widgetConfig = {
+        "feedMode": "all_symbols",
+        "isTransparent": false,
+        "displayMode": "regular",
+        "width": "100%",
+        "height": "100%",
+        "colorTheme": currentTheme,
+        "locale": "en"
+    };
+
+    script.innerHTML = JSON.stringify(widgetConfig);
+    if(container.current) {
       container.current.appendChild(script);
     }
+    
   }, [theme]);
 
   return (

@@ -12,13 +12,15 @@ function TickerTapeWidget() {
     () => {
         if (!container.current) return;
         
-        // Clear previous widget if theme changes
         container.current.innerHTML = '';
 
         const script = document.createElement("script");
         script.src = "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
         script.type = "text/javascript";
         script.async = true;
+
+        const currentTheme = theme === "system" ? window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" : theme;
+        
         script.innerHTML = JSON.stringify({
           "symbols": [
             {
@@ -47,7 +49,7 @@ function TickerTapeWidget() {
             }
           ],
           "showSymbolLogo": true,
-          "colorTheme": theme === 'light' ? 'light' : 'dark',
+          "colorTheme": currentTheme,
           "isTransparent": true,
           "displayMode": "adaptive",
           "locale": "en"

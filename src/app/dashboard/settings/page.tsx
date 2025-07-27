@@ -46,12 +46,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Copy, Loader2, Share2 } from "lucide-react";
-import { Metadata } from "next";
-
-// export const metadata: Metadata = {
-//   title: "Settings - HsebliTrade",
-//   description: "Manage your account, appearance, and data settings.",
-// };
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {

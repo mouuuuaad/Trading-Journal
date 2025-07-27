@@ -20,7 +20,7 @@ function TradingViewWidget() {
     script.type = "text/javascript";
     script.async = true;
 
-    const currentTheme = theme;
+    const currentTheme = theme === "system" ? window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light" : theme;
 
     const widgetConfig = {
       "symbols": [
@@ -33,9 +33,8 @@ function TradingViewWidget() {
       "width": "100%",
       "height": "100%",
       "locale": "en",
-      "colorTheme": currentTheme === 'light' ? 'light' : 'dark',
-      "isTransparent": false,
-      "backgroundColor": "#000000",
+      "colorTheme": currentTheme,
+      "isTransparent": true,
       "autosize": true,
       "showVolume": true,
       "showMA": false,
@@ -72,7 +71,7 @@ function TradingViewWidget() {
   }, [theme]);
 
   return (
-    <Card className='h-[380px] w-full p-0 overflow-hidden'>
+    <Card className='h-[380px] w-full p-0 overflow-hidden bg-transparent'>
         <div className="tradingview-widget-container h-full" ref={container}>
              <div className="tradingview-widget-container__widget h-full"></div>
         </div>

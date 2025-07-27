@@ -5,32 +5,32 @@
 
 @layer base {
   :root {
-    --background: 224 10% 4%; /* Very dark blue-gray */
-    --foreground: 210 20% 95%; /* Light gray */
+    --background: 0 0% 100%;
+    --foreground: 224 10% 4%;
     
-    --card: 224 10% 9%; /* Slightly lighter than background */
-    --card-foreground: 210 20% 95%;
+    --card: 0 0% 98%;
+    --card-foreground: 224 10% 4%;
     
-    --popover: 224 10% 4%;
-    --popover-foreground: 210 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 10% 4%;
     
-    --primary: 150 70% 45%; /* Vibrant Green */
+    --primary: 150 70% 45%;
     --primary-foreground: 210 20% 98%;
     
-    --secondary: 224 10% 15%; /* Mid-tone gray */
-    --secondary-foreground: 210 20% 95%;
+    --secondary: 220 10% 95%;
+    --secondary-foreground: 224 10% 4%;
     
-    --muted: 224 10% 15%;
-    --muted-foreground: 215 15% 65%; /* Lighter gray for text */
+    --muted: 220 10% 95%;
+    --muted-foreground: 215 15% 45%;
     
-    --accent: 150 70% 45%; 
-    --accent-foreground: 210 20% 98%;
+    --accent: 220 10% 95%;
+    --accent-foreground: 224 10% 4%;
     
-    --destructive: 0 63% 45%; /* Vibrant Red */
+    --destructive: 0 63% 45%;
     --destructive-foreground: 210 20% 98%;
     
-    --border: 224 10% 12%; 
-    --input: 224 10% 12%;
+    --border: 220 10% 90%; 
+    --input: 220 10% 90%;
     --ring: 150 70% 45%;
     
     --radius: 0.5rem;
@@ -61,7 +61,7 @@
     --muted: 224 10% 15%;
     --muted-foreground: 215 15% 65%;
     
-    --accent: 150 70% 45%;
+    --accent: 224 10% 15%;
     --accent-foreground: 210 20% 98%;
     
     --destructive: 0 63% 45%;
