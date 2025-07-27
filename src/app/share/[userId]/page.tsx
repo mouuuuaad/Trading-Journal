@@ -25,6 +25,8 @@ import Link from "next/link";
 import { HsebliTradeIcon } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GoldChart } from "@/components/dashboard/gold-chart";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 type FilterType = "asset" | "result" | "direction";
@@ -92,6 +94,9 @@ function calculateStats(trades: Trade[]) {
         { name: 'Break Even', value: 0, fill: "hsl(var(--muted-foreground))" },
       ],
       weekdayPerformance: [],
+      avgTradePnl: 0,
+      bestTradePnl: 0,
+      worstTradePnl: 0,
     };
   }
 
@@ -100,15 +105,16 @@ function calculateStats(trades: Trade[]) {
   const winningTrades = trades.filter((trade) => trade.result === "Win").length;
   const losingTrades = trades.filter((trade) => trade.result === "Loss").length;
   const beTrades = trades.filter((trade) => trade.result === "BE").length;
-  const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
+  const winRate = totalTrades > 0 ? (winningTrades / (winningTrades + losingTrades)) * 100 : 0;
   const totalReward = trades.filter(t => t.result === 'Win').reduce((acc, trade) => acc + Math.abs(trade.takeProfit - trade.entryPrice), 0);
   const totalRisk = trades.filter(t => t.result === 'Loss').reduce((acc, trade) => acc + Math.abs(trade.entryPrice - trade.stopLoss), 0);
   const averageReward = winningTrades > 0 ? totalReward / winningTrades : 0;
   const averageRisk = losingTrades > 0 ? totalRisk / losingTrades : 0;
   const rrRatio = averageRisk > 0 ? averageReward / averageRisk : 0;
-  const avgPnl = totalTrades > 0 ? totalPnl / totalTrades : 0;
-  const bestTrade = trades.reduce((max, trade) => (trade.pnl > (max.pnl ?? -Infinity)) ? trade : max, trades[0]);
-  const worstTrade = trades.reduce((min, trade) => (trade.pnl < (min.pnl ?? Infinity)) ? trade : min, trades[0]);
+  const avgTradePnl = totalTrades > 0 ? totalPnl / totalTrades : 0;
+  const bestTradePnl = trades.length > 0 ? Math.max(0, ...trades.map(t => t.pnl)) : 0;
+  const worstTradePnl = trades.length > 0 ? Math.min(0, ...trades.map(t => t.pnl)) : 0;
+
 
   const performanceData = trades.slice().sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .reduce((acc, trade, index) => {
@@ -133,7 +139,8 @@ function calculateStats(trades: Trade[]) {
 
   return {
     totalPnl, winRate, winningTrades, losingTrades, beTrades, totalTrades, rrRatio,
-    avgPnl, bestTrade, worstTrade, performanceData, winLossData, weekdayPerformance: weekdayPnl
+    avgPnl: avgTradePnl, bestTrade: bestTradePnl, worstTrade: worstTradePnl, performanceData, winLossData, weekdayPerformance: weekdayPnl,
+    avgTradePnl, bestTradePnl, worstTradePnl
   };
 }
 
@@ -233,17 +240,41 @@ export default function SharePage() {
         </div>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
-        <StatsCards {...stats} dateRange={dateRange} setDateRange={setDateRange} />
+        <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold">Dashboard</h1>
+            <Select value={dateRange} onValueChange={(value) => setDateRange(value as DateRange)}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Date Range" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="this-year">This Year</SelectItem>
+                    <SelectItem value="this-month">This Month</SelectItem>
+                    <SelectItem value="this-week">This Week</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+
         <div className="grid gap-4 md:gap-8">
           {allTrades.length === 0 ? (
             <Card><CardHeader><CardTitle>No Trades Logged</CardTitle><CardDescription>This user hasn't logged any trades yet.</CardDescription></CardHeader></Card>
           ) : (
             <>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
-                <div className="lg:col-span-4"><PerformanceChart data={stats.performanceData} /></div>
-                <div className="lg:col-span-3"><WinLossChart data={stats.winLossData} /></div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <PerformanceChart data={stats.performanceData} totalPnl={stats.totalPnl} />
+                </div>
+                <div className="lg:col-span-1">
+                    <StatsCards stats={stats} />
+                </div>
+                <div className="lg:col-span-3">
+                    <WinLossChart data={stats.winLossData} />
+                </div>
+                <div className="lg:col-span-3">
+                    <GoldChart />
+                </div>
               </div>
-              <div className="grid gap-4 md:gap-8"><GoldChart /></div>
               <div>
                 <TradeFilters uniqueAssets={uniqueAssets} filters={filters} onFilterChange={handleFilterChange} />
                 <TradeTable trades={filteredTrades} />
