@@ -87,9 +87,6 @@ export async function GET(request: Request, { params }: { params: { userId: stri
       };
     });
     
-    // Delete the token after it has been used
-    await tokenDoc.ref.delete();
-
     return NextResponse.json({ user: userData, trades });
 
   } catch (error) {
