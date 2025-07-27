@@ -1,7 +1,8 @@
 
 // src/app/api/share/[userId]/route.ts
-import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
-import { db } from "@/lib/firebase-admin"; // Using admin SDK
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase-admin"; // Using admin SDK for server-side access
+import { getAuth } from "firebase-admin/auth";
 import { NextResponse } from "next/server";
 
 // This tells Next.js to treat this route as dynamic,
@@ -18,10 +19,19 @@ export async function GET(
       return NextResponse.json({ error: "User ID is required" }, { status: 400 });
     }
 
-    // 1. Fetch User Data (like displayName)
-    const userDocRef = doc(db, `users/${userId}`);
-    const userDocSnap = await getDoc(userDocRef);
-    const userData = userDocSnap.exists() ? userDocSnap.data() : { displayName: "Anonymous User", email: "" };
+    // 1. Fetch User Data using the Admin SDK
+    let userData = { displayName: "Anonymous User", photoURL: "" };
+    try {
+        const userRecord = await getAuth().getUser(userId);
+        userData = {
+            displayName: userRecord.displayName || "Anonymous User",
+            photoURL: userRecord.photoURL || ""
+        };
+    } catch (error: any) {
+        // If the user doesn't exist in Firebase Auth, we can still proceed
+        // but log the error. The profile will just show "Anonymous User".
+        console.warn(`Could not fetch user data for a share link: ${error.message}`);
+    }
 
 
     // 2. Fetch Trades
