@@ -143,7 +143,7 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
     };
 
     try {
-      if (isEditMode) {
+      if (isEditMode && tradeToEdit) {
         const tradeRef = doc(db, "trades", tradeToEdit.id);
         await updateDoc(tradeRef, tradeData);
         toast({ title: "Trade Updated", description: `Successfully updated trade for ${data.asset}.` });
@@ -167,7 +167,7 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
      <Button size="sm" className="h-9 gap-1.5">
           <PlusCircle className="h-4 w-4" />
           <span>
-            Import Trades
+            Add Trade
           </span>
         </Button>
   ) : null;

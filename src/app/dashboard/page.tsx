@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ExportButton } from "@/components/dashboard/export-button";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 
@@ -76,6 +77,8 @@ function calculateStats(trades: Trade[]) {
       avgTradePnl: 0,
       performanceData: [],
       weekdayPerformance: [],
+      beTrades: 0,
+      rrRatio: 0,
     };
   }
 
@@ -83,6 +86,7 @@ function calculateStats(trades: Trade[]) {
   const totalTrades = trades.length;
   const winningTrades = trades.filter((trade) => trade.result === "Win").length;
   const losingTrades = trades.filter((trade) => trade.result === "Loss").length;
+  const beTrades = trades.filter((trade) => trade.result === "BE").length;
 
   const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
   
@@ -90,6 +94,13 @@ function calculateStats(trades: Trade[]) {
 
   const bestTradePnl = trades.length > 0 ? Math.max(...trades.map(t => t.pnl)) : 0;
   const worstTradePnl = trades.length > 0 ? Math.min(...trades.map(t => t.pnl)) : 0;
+
+    const totalReward = trades.filter(t => t.result === 'Win').reduce((acc, trade) => acc + Math.abs(trade.takeProfit - trade.entryPrice), 0);
+    const totalRisk = trades.filter(t => t.result === 'Loss').reduce((acc, trade) => acc + Math.abs(trade.entryPrice - trade.stopLoss), 0);
+    const averageReward = winningTrades > 0 ? totalReward / winningTrades : 0;
+    const averageRisk = losingTrades > 0 ? totalRisk / losingTrades : 0;
+    const rrRatio = averageRisk > 0 ? averageReward / averageRisk : 0;
+
 
   const performanceData = trades
     .slice() 
@@ -132,7 +143,9 @@ function calculateStats(trades: Trade[]) {
     worstTradePnl,
     avgTradePnl,
     performanceData,
-    weekdayPerformance: weekdayPnl
+    weekdayPerformance: weekdayPnl,
+    beTrades,
+    rrRatio,
   };
 }
 
@@ -196,6 +209,7 @@ export default function DashboardPage() {
                         <SelectItem value="today">Today</SelectItem>
                     </SelectContent>
                 </Select>
+                <ExportButton trades={filteredTrades} stats={stats} user={user} />
                 <AddTradeModal />
             </div>
         </div>

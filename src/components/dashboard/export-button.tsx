@@ -88,7 +88,7 @@ export function ExportButton({ trades, stats, user }: ExportButtonProps) {
         // Add Trade Table
         const tableColumn = ["Date", "Asset", "Direction", "Entry", "SL", "TP", "Result", "P/L ($)"];
         const tableRows = trades.map(trade => [
-            format(trade.date, "yyyy-MM-dd"),
+            format(new Date(trade.date), "yyyy-MM-dd"),
             trade.asset,
             trade.direction,
             trade.entryPrice.toFixed(4),
@@ -109,7 +109,7 @@ export function ExportButton({ trades, stats, user }: ExportButtonProps) {
                 const row = data.row;
                 const cell = data.cell;
                 if (row.section === 'body') {
-                    const result = row.raw[6]; // 'Result' column
+                    const result = (row.raw as any[])[6]; // 'Result' column
                     if (result === 'Win') {
                         cell.styles.fillColor = [237, 247, 237]; // Light green
                     } else if (result === 'Loss') {
@@ -120,7 +120,7 @@ export function ExportButton({ trades, stats, user }: ExportButtonProps) {
         });
 
         // Add Footer
-        const pageCount = doc.getNumberOfPages();
+        const pageCount = (doc as any).internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(10);
