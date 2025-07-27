@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import admin from 'firebase-admin';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
 
-// This tells Next.js to run this route dynamically
 export const dynamic = 'force-dynamic';
 
 const serviceAccount = {
@@ -32,9 +31,8 @@ function getFirebaseAdmin() {
 }
 
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
+export async function GET(request: Request, { params }: { params: { userId: string } }) {
+  const token = params.userId; // The token is now the dynamic part of the URL
 
   if (!token) {
     return NextResponse.json({ error: 'Share token is missing' }, { status: 400 });
@@ -100,3 +98,5 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: `A server error occurred while fetching the share data: ${errorMessage}` }, { status: 500 });
   }
 }
+
+    

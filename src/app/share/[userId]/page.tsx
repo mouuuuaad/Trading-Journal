@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Trade } from "@/lib/types";
 import {
   startOfToday,
@@ -144,7 +144,7 @@ const getInitials = (name: string | null | undefined) => {
 };
 
 export default function SharePage() {
-  const searchParams = useSearchParams();
+  const params = useParams();
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -153,7 +153,7 @@ export default function SharePage() {
   const [filters, setFilters] = useState({ asset: "all", result: "all", direction: "all" });
 
   useEffect(() => {
-    const token = searchParams.get('token');
+    const token = params.userId as string; // userId is the token in the new URL structure
     if (!token) {
         setError("Share link is missing a token.");
         setIsLoading(false);
@@ -164,7 +164,7 @@ export default function SharePage() {
         setIsLoading(true);
         setError(null);
         try {
-            const res = await fetch(`/api/share?token=${token}`);
+            const res = await fetch(`/api/share/${token}`);
             const data = await res.json();
             if (!res.ok) {
                 throw new Error(data.error || `Failed to fetch data: ${res.statusText}`);
@@ -180,7 +180,7 @@ export default function SharePage() {
     };
 
     fetchData();
-  }, [searchParams]);
+  }, [params.userId]);
 
   const handleFilterChange = (filterType: FilterType, value: string) => setFilters(prev => ({ ...prev, [filterType]: value }));
   const filteredTrades = useMemo(() => filterTrades(allTrades, dateRange, filters), [allTrades, dateRange, filters]);
@@ -204,13 +204,13 @@ export default function SharePage() {
   }
 
   if (error) {
-    const isExpired = error.includes("expired");
+    const isExpired = error.includes("expired") || error.includes("invalid");
     return (
         <main className="flex flex-1 flex-col items-center justify-center gap-4 p-4 sm:p-6 md:gap-8 md:p-8">
             <Card className="w-full max-w-lg">
                 <CardHeader className="text-center">
                     {isExpired ? <Clock className="mx-auto h-12 w-12 text-destructive" /> : <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />}
-                    <CardTitle className="mt-4">{isExpired ? "Link Expired" : "Could Not Load Profile"}</CardTitle>
+                    <CardTitle className="mt-4">{isExpired ? "Link Invalid or Expired" : "Could Not Load Profile"}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-center text-muted-foreground">{error}</p>
@@ -261,3 +261,5 @@ export default function SharePage() {
     </>
   );
 }
+
+    

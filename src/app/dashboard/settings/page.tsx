@@ -101,16 +101,31 @@ export default function SettingsPage() {
   };
 
   const handleGenerateLink = async () => {
+    if (!user) {
+       toast({
+          title: "Not Logged In",
+          description: "You must be logged in to generate a link.",
+          variant: "destructive",
+        });
+        return;
+    }
+
     setIsGeneratingLink(true);
     try {
-        const response = await fetch('/api/share/generate', { method: 'POST' });
+        const idToken = await user.getIdToken();
+        const response = await fetch('/api/share/generate', { 
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${idToken}`
+            }
+        });
         const data = await response.json();
 
         if (!response.ok) {
             throw new Error(data.error || "Failed to generate link");
         }
         
-        const link = `${window.location.origin}/share?token=${data.token}`;
+        const link = `${window.location.origin}/share/${data.token}`;
         setShareableLink(link);
 
     } catch (error: any) {
@@ -358,3 +373,5 @@ export default function SettingsPage() {
     </>
   );
 }
+
+    
