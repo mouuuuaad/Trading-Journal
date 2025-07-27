@@ -201,7 +201,7 @@ const getInitials = (name: string | null | undefined) => {
 };
 
 interface ShareClientPageProps {
-  initialUser: User;
+  initialUser: User | null;
   initialTrades: Trade[];
   error?: string | null;
 }
