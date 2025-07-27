@@ -201,7 +201,8 @@ const getInitials = (name: string | null | undefined) => {
 };
 
 
-export default function SharePage({ params: { userId } }: { params: { userId: string } }) {
+export default function SharePage({ params }: { params: { userId: string } }) {
+  const { userId } = params;
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -369,4 +370,3 @@ export default function SharePage({ params: { userId } }: { params: { userId: st
     </>
   );
 }
-
