@@ -151,10 +151,10 @@ export default function ReviewPage() {
                                     <CardDescription>{format(currentTrade.date, "eeee, MMMM d, yyyy 'at' p")}</CardDescription>
                                 </div>
                                 <div className="text-right">
-                                    <Badge variant={currentTrade.result === "Win" ? "default" : currentTrade.result === "Loss" ? "destructive" : "secondary"} className={cn("w-[60px] justify-center text-base", currentTrade.result === 'Win' ? 'bg-accent text-accent-foreground hover:bg-accent/80' : '')}>
+                                    <Badge variant={currentTrade.result === "Win" ? "default" : currentTrade.result === "Loss" ? "destructive" : "secondary"} className={cn("w-[60px] justify-center text-base", currentTrade.result === 'Win' ? 'bg-primary text-primary-foreground hover:bg-primary/80' : '')}>
                                         {currentTrade.result}
                                     </Badge>
-                                    <p className={cn("font-bold text-lg", currentTrade.pnl >= 0 ? "text-accent" : "text-destructive")}>
+                                    <p className={cn("font-bold text-lg", currentTrade.pnl >= 0 ? "text-primary" : "text-destructive")}>
                                         {currentTrade.pnl >= 0 ? "+" : ""}${currentTrade.pnl.toFixed(2)}
                                     </p>
                                 </div>

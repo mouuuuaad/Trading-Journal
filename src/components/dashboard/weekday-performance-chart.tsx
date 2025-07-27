@@ -53,7 +53,7 @@ export function WeekdayPerformanceChart({ data }: WeekdayPerformanceChartProps) 
               />
               <Bar dataKey="pnl" radius={4}>
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.pnl >= 0 ? "hsl(var(--chart-2))" : "hsl(var(--destructive))"} />
+                  <Cell key={`cell-${index}`} fill={entry.pnl >= 0 ? "hsl(var(--primary))" : "hsl(var(--destructive))"} />
                 ))}
               </Bar>
             </BarChart>

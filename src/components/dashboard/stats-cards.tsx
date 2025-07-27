@@ -78,12 +78,12 @@ export function StatsCards({ totalPnl, winRate, winningTrades, totalTrades, rrRa
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Profit/Loss</CardTitle>
-          <span className={cn(totalPnl >= 0 ? "text-accent" : "text-destructive")}>
+          <span className={cn(totalPnl >= 0 ? "text-primary" : "text-destructive")}>
             {totalPnl >= 0 ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
           </span>
         </CardHeader>
         <CardContent>
-          <div className={cn("text-2xl font-bold", totalPnl >= 0 ? "text-accent" : "text-destructive")}>
+          <div className={cn("text-2xl font-bold", totalPnl >= 0 ? "text-primary" : "text-destructive")}>
             {totalPnl >= 0 ? "+" : "-"} ${Math.abs(totalPnl).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </CardContent>
@@ -103,9 +103,9 @@ export function StatsCards({ totalPnl, winRate, winningTrades, totalTrades, rrRa
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Average R:R</CardTitle>
-          <span className="text-primary flex">
+          <span className="text-muted-foreground flex">
             <ArrowUpRight className="h-4 w-4 text-primary" />
-            <ArrowDownLeft className="h-4 w-4 text-primary" />
+            <ArrowDownLeft className="h-4 w-4 text-destructive" />
           </span>
         </CardHeader>
         <CardContent>
@@ -131,7 +131,7 @@ export function StatsCards({ totalPnl, winRate, winningTrades, totalTrades, rrRa
           <Divide className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-           <div className={cn("text-2xl font-bold", avgPnl >= 0 ? "text-accent" : "text-destructive")}>
+           <div className={cn("text-2xl font-bold", avgPnl >= 0 ? "text-primary" : "text-destructive")}>
              {avgPnl >= 0 ? "+" : "-"} ${Math.abs(avgPnl).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <p className="text-xs text-muted-foreground">per trade</p>
@@ -146,7 +146,7 @@ export function StatsCards({ totalPnl, winRate, winningTrades, totalTrades, rrRa
         <CardContent>
             {bestTrade ? (
                 <>
-                <div className="text-2xl font-bold text-accent">
+                <div className="text-2xl font-bold text-primary">
                     +${bestTrade.pnl.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
                 <p className="text-xs text-muted-foreground">{bestTrade.asset}</p>

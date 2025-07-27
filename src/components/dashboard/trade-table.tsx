@@ -136,7 +136,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                         <div
                           className={cn(
                             "text-sm text-muted-foreground",
-                            trade.direction === "Buy" ? "text-accent" : "text-destructive"
+                            trade.direction === "Buy" ? "text-primary" : "text-destructive"
                           )}
                         >
                           {trade.direction}
@@ -153,7 +153,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                           }
                           className={cn(
                             "w-[50px] justify-center",
-                            trade.result === 'Win' ? 'bg-accent text-accent-foreground hover:bg-accent/80' : ''
+                            trade.result === 'Win' ? 'bg-primary text-primary-foreground hover:bg-primary/80' : ''
                           )}
                         >
                           {trade.result}
@@ -162,7 +162,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                       <TableCell
                         className={cn(
                           "hidden sm:table-cell text-right font-mono",
-                          trade.pnl >= 0 ? "text-accent" : "text-destructive"
+                          trade.pnl >= 0 ? "text-primary" : "text-destructive"
                         )}
                       >
                         {trade.pnl >= 0 ? "+" : ""}${Math.abs(trade.pnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

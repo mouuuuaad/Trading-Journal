@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
@@ -26,7 +27,7 @@ export function WinLossChart({ data }: WinLossChartProps) {
     },
     wins: {
       label: "Wins",
-      color: "hsl(var(--accent))",
+      color: "hsl(var(--primary))",
     },
     losses: {
       label: "Losses",
@@ -37,6 +38,13 @@ export function WinLossChart({ data }: WinLossChartProps) {
       color: "hsl(var(--muted-foreground))",
     },
   };
+  
+  const chartData = [
+    { name: 'Wins', value: data.find(d => d.name === 'Wins')?.value || 0, fill: "hsl(var(--primary))" },
+    { name: 'Losses', value: data.find(d => d.name === 'Losses')?.value || 0, fill: "hsl(var(--destructive))" },
+    { name: 'Break Even', value: data.find(d => d.name === 'Break Even')?.value || 0, fill: "hsl(var(--muted-foreground))" },
+  ]
+
 
   return (
     <Card>
@@ -53,7 +61,7 @@ export function WinLossChart({ data }: WinLossChartProps) {
                 content={<ChartTooltipContent hideLabel />}
               />
               <Pie
-                data={data}
+                data={chartData}
                 dataKey="value"
                 nameKey="name"
                 innerRadius={60}

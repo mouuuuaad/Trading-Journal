@@ -41,12 +41,12 @@ export function TradeDetailsModal({ isOpen, onOpenChange, trade }: TradeDetailsM
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-2">
-            <DetailRow label="Direction" value={trade.direction} valueClassName={trade.direction === "Buy" ? "text-accent" : "text-destructive"} />
+            <DetailRow label="Direction" value={trade.direction} valueClassName={trade.direction === "Buy" ? "text-primary" : "text-destructive"} />
             <DetailRow label="Entry Price" value={trade.entryPrice.toFixed(4)} />
             <DetailRow label="Stop Loss" value={trade.stopLoss.toFixed(4)} />
             <DetailRow label="Take Profit" value={trade.takeProfit.toFixed(4)} />
-            <DetailRow label="Result" value={<Badge variant={trade.result === "Win" ? "default" : trade.result === "Loss" ? "destructive" : "secondary"} className={cn("w-[50px] justify-center", trade.result === 'Win' ? 'bg-accent text-accent-foreground hover:bg-accent/80' : '')}>{trade.result}</Badge>} />
-            <DetailRow label="P/L" value={`$${trade.pnl.toFixed(2)}`} valueClassName={trade.pnl >= 0 ? "text-accent" : "text-destructive"} />
+            <DetailRow label="Result" value={<Badge variant={trade.result === "Win" ? "default" : trade.result === "Loss" ? "destructive" : "secondary"} className={cn("w-[50px] justify-center", trade.result === 'Win' ? 'bg-primary text-primary-foreground hover:bg-primary/80' : '')}>{trade.result}</Badge>} />
+            <DetailRow label="P/L" value={`$${trade.pnl.toFixed(2)}`} valueClassName={trade.pnl >= 0 ? "text-primary" : "text-destructive"} />
             
             {trade.screenshotUrl && (
                  <div className="space-y-2 pt-4">
