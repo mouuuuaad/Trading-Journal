@@ -10,7 +10,9 @@ function TickerTapeWidget() {
 
   useEffect(
     () => {
-        if (!container.current) return;
+        if (!container.current) {
+            return;
+        }
         
         container.current.innerHTML = '';
 

@@ -11,10 +11,11 @@ function TradingViewWidget() {
   const { theme } = useTheme();
 
   useEffect(() => {
-    if (container.current) {
-        container.current.innerHTML = '';
+    if (!container.current) {
+      return;
     }
 
+    container.current.innerHTML = '';
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js";
     script.type = "text/javascript";
@@ -65,9 +66,7 @@ function TradingViewWidget() {
     
     script.innerHTML = JSON.stringify(widgetConfig);
 
-    if (container.current) {
-      container.current.appendChild(script);
-    }
+    container.current.appendChild(script);
   }, [theme]);
 
   return (
