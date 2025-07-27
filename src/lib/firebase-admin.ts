@@ -1,8 +1,8 @@
-
 // src/lib/firebase-admin.ts
 import admin from 'firebase-admin';
 import type { ServiceAccount } from 'firebase-admin';
 
+// This is a sensitive file and should not be exposed to the client.
 // The service account key is now directly in the code for simplicity in development.
 // In production, this should always be an environment variable.
 const serviceAccount: ServiceAccount = {
