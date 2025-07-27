@@ -3,6 +3,8 @@
 import admin from 'firebase-admin';
 import type { ServiceAccount } from 'firebase-admin';
 
+// The service account key is now directly in the code for simplicity in development.
+// In production, this should always be an environment variable.
 const serviceAccount: ServiceAccount = {
   "type": "service_account",
   "project_id": "compass-6b774",
@@ -17,18 +19,19 @@ const serviceAccount: ServiceAccount = {
   "universe_domain": "googleapis.com"
 };
 
-// This function ensures we initialize the app only once
+// This function ensures we initialize the app only once and returns the services
 function getFirebaseAdmin() {
   if (!admin.apps.length) {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
   }
-  return admin;
+  
+  // Return the services from the initialized app
+  return { 
+    db: admin.firestore(), 
+    auth: admin.auth() 
+  };
 }
 
-// Export the initialized services
-const db = getFirebaseAdmin().firestore();
-const auth = getFirebaseAdmin().auth();
-
-export { db, auth };
+export { getFirebaseAdmin };
