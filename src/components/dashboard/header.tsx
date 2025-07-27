@@ -131,7 +131,7 @@ export function Header({ children }: HeaderProps) {
             <DropdownMenuLabel>{user?.displayName || user?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/dashboard/support')}>Support</DropdownMenuItem>
             <DropdownMenuSeparator />
              <DropdownMenuItem onClick={handleLogout}>
                 Logout
