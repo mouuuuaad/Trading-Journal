@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Copy, Loader2, Share2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -197,7 +198,7 @@ export default function SettingsPage() {
         <h1 className="font-headline text-2xl font-bold tracking-tight md:text-3xl">Settings</h1>
         <p className="text-muted-foreground">Manage your account, appearance, and data.</p>
       </div>
-      <Tabs defaultValue="profile" className="w-full">
+      <Tabs defaultValue="appearance" className="w-full">
         <TabsList className="grid w-full max-w-lg grid-cols-4">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
@@ -252,7 +253,7 @@ export default function SettingsPage() {
                   <RadioGroupItem value="light" id="light" className="peer sr-only" />
                   <Label
                     htmlFor="light"
-                    className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                    className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                   >
                      <div className="w-full bg-gray-100 p-2 rounded-lg aspect-video flex items-center">
                         <div className="space-y-2 rounded-sm bg-white p-2 shadow-sm w-full">
@@ -267,7 +268,7 @@ export default function SettingsPage() {
                   <RadioGroupItem value="dark" id="dark" className="peer sr-only" />
                   <Label
                     htmlFor="dark"
-                     className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                     className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                   >
                     <div className="w-full bg-gray-900 p-2 rounded-lg aspect-video flex items-center">
                         <div className="space-y-2 rounded-sm bg-gray-800 p-2 shadow-sm w-full">
@@ -282,7 +283,7 @@ export default function SettingsPage() {
                   <RadioGroupItem value="system" id="system" className="peer sr-only" />
                   <Label
                     htmlFor="system"
-                     className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                     className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                   >
                     <div className="w-full bg-gray-100 dark:bg-gray-900 p-2 rounded-lg aspect-video flex items-center">
                         <div className="space-y-2 rounded-sm bg-white dark:bg-gray-800 p-2 shadow-sm w-full">
