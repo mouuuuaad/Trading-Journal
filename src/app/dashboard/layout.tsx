@@ -6,6 +6,7 @@ import { Header } from "@/components/dashboard/header";
 import Link from "next/link";
 import { HsebliTradeIcon } from "@/components/icons";
 import { Metadata } from "next";
+import { TickerTape } from "@/components/dashboard/ticker-tape";
 
 export const metadata: Metadata = {
   title: "Dashboard - HsebliTrade",
@@ -28,12 +29,17 @@ export default function DashboardLayout({
       <AuthProvider>
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
           <Header/>
-          {children}
-          <footer className="mt-auto flex items-center justify-center p-4 no-print">
+          <div className="flex-1">
+            {children}
+          </div>
+          <footer className="mt-auto flex flex-col items-center justify-center p-4 gap-4 no-print">
              <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
                 <HsebliTradeIcon className="h-5 w-5" />
                 <span>Created by Mouaad Idoufkir</span>
             </Link>
+            <div className="fixed bottom-0 left-0 right-0 w-full z-50">
+                <TickerTape />
+            </div>
           </footer>
         </div>
         <Toaster />
