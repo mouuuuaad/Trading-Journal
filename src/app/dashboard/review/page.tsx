@@ -21,7 +21,7 @@ import { Metadata } from "next";
 
 // This component now sets its own metadata
 // export const metadata: Metadata = {
-//   title: "Trade Review - TradeVision",
+//   title: "Trade Review - HsebliTrade",
 //   description: "Review your past trades one-by-one to learn and improve.",
 // };
 

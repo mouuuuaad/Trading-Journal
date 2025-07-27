@@ -17,14 +17,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { WinLossChart } from "@/components/dashboard/win-loss-chart";
-import { WeekdayPerformanceChart } from "@/components/dashboard/weekday-performance-chart";
 import { TradeTable } from "@/components/dashboard/trade-table";
 import { TradeFilters } from "@/components/dashboard/trade-filters";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Clock } from "lucide-react";
 import Link from "next/link";
-import { TradeVisionIcon } from "@/components/icons";
+import { HsebliTradeIcon } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { GoldChart } from "@/components/dashboard/gold-chart";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 type FilterType = "asset" | "result" | "direction";
@@ -223,7 +223,7 @@ export default function SharePage() {
   return (
     <>
       <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
-        <div className="flex items-center gap-2"><TradeVisionIcon className="h-6 w-6" /><h1 className="font-headline text-xl text-foreground">TradeVision</h1></div>
+        <div className="flex items-center gap-2"><HsebliTradeIcon className="h-6 w-6" /><h1 className="font-headline text-xl text-foreground">HsebliTrade</h1></div>
         <div className="ml-auto flex items-center gap-3">
             <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Viewing public profile of</span>
              <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export default function SharePage() {
                 <div className="lg:col-span-4"><PerformanceChart data={stats.performanceData} /></div>
                 <div className="lg:col-span-3"><WinLossChart data={stats.winLossData} /></div>
               </div>
-              <div className="grid gap-4 md:gap-8"><WeekdayPerformanceChart data={stats.weekdayPerformance} /></div>
+              <div className="grid gap-4 md:gap-8"><GoldChart /></div>
               <div>
                 <TradeFilters uniqueAssets={uniqueAssets} filters={filters} onFilterChange={handleFilterChange} />
                 <TradeTable trades={filteredTrades} />
@@ -254,7 +254,7 @@ export default function SharePage() {
       </main>
       <footer className="mt-auto flex items-center justify-center p-4">
              <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
-                <TradeVisionIcon className="h-5 w-5" />
+                <HsebliTradeIcon className="h-5 w-5" />
                 <span>Created by Mouaad Idoufkir</span>
             </Link>
       </footer>

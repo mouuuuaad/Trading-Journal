@@ -8,7 +8,7 @@ import { collection, query, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
-import { WeekdayPerformanceChart } from "@/components/dashboard/weekday-performance-chart";
+import { GoldChart } from "@/components/dashboard/gold-chart";
 import { TradeTable } from "@/components/dashboard/trade-table";
 import { Trade } from "@/lib/types";
 import {
@@ -17,7 +17,6 @@ import {
   startOfMonth,
   startOfYear,
   parseISO,
-  getDay,
 } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
 import { AddTradeModal } from "@/components/dashboard/add-trade-modal";
@@ -76,7 +75,6 @@ function calculateStats(trades: Trade[]) {
       worstTradePnl: 0,
       avgTradePnl: 0,
       performanceData: [],
-      weekdayPerformance: [],
       beTrades: 0,
       rrRatio: 0,
     };
@@ -114,24 +112,7 @@ function calculateStats(trades: Trade[]) {
       acc.push({ date: `Trade #${index + 1}`, pnl: cumulativePnl });
       return acc;
     }, [] as { date: string; pnl: number }[]);
-
   
-  const weekdayPnl = [
-    { name: 'Mon', pnl: 0 },
-    { name: 'Tue', pnl: 0 },
-    { name: 'Wed', pnl: 0 },
-    { name: 'Thu', pnl: 0 },
-    { name: 'Fri', pnl: 0 },
-  ];
-
-  trades.forEach(trade => {
-    const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
-    const dayIndex = getDay(tradeDate); // 0 (Sunday) to 6 (Saturday)
-    if (dayIndex >= 1 && dayIndex <= 5) { // Monday to Friday
-        weekdayPnl[dayIndex - 1].pnl += trade.pnl;
-    }
-  });
-
 
   return {
     totalPnl,
@@ -143,7 +124,6 @@ function calculateStats(trades: Trade[]) {
     worstTradePnl,
     avgTradePnl,
     performanceData,
-    weekdayPerformance: weekdayPnl,
     beTrades,
     rrRatio,
   };
@@ -233,7 +213,7 @@ export default function DashboardPage() {
                     </div>
                     {/* Daily Performance */}
                     <div className="lg:col-span-3">
-                         <WeekdayPerformanceChart data={stats.weekdayPerformance} />
+                         <GoldChart />
                     </div>
                     {/* Trade Table */}
                     <div className="lg:col-span-3">

@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, Mail, Phone } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { TradeVisionIcon } from "@/components/icons";
+import { HsebliTradeIcon } from "@/components/icons";
 
 const TelegramIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -69,7 +69,7 @@ export default function GuestPage() {
               </Avatar>
               <div>
                 <CardTitle className="text-2xl font-headline">Welcome, {user?.displayName || "Explorer"}!</CardTitle>
-                <CardDescription className="mt-1">Thank you for your interest in TradeVision.</CardDescription>
+                <CardDescription className="mt-1">Thank you for your interest in HsebliTrade.</CardDescription>
               </div>
            </div>
         </CardHeader>
@@ -110,7 +110,7 @@ export default function GuestPage() {
         </CardContent>
        </Card>
         <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
-            <TradeVisionIcon className="h-5 w-5" />
+            <HsebliTradeIcon className="h-5 w-5" />
             <span>Created by Mouaad Idoufkir</span>
         </Link>
     </div>

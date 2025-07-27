@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Public Profile - TradeVision",
+  title: "Public Profile - HsebliTrade",
   description: "View a shared, read-only trading journal.",
 };
 

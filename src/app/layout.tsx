@@ -3,7 +3,7 @@ import './globals.css';
 import { AuthProvider } from '@/components/auth-provider';
 
 export const metadata: Metadata = {
-  title: 'TradeVision - Your Personal Trading Journal',
+  title: 'HsebliTrade - Your Personal Trading Journal',
   description: 'Log, manage, and analyze your trades with an interactive and modern dashboard.',
 };
 

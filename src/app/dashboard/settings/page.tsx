@@ -49,7 +49,7 @@ import { Copy, Loader2, Share2 } from "lucide-react";
 import { Metadata } from "next";
 
 // export const metadata: Metadata = {
-//   title: "Settings - TradeVision",
+//   title: "Settings - HsebliTrade",
 //   description: "Manage your account, appearance, and data settings.",
 // };
 

@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
-import { TradeVisionIcon } from '@/components/icons';
+import { HsebliTradeIcon } from '@/components/icons';
 import { FilePenLine, PieChart, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 
@@ -124,11 +124,11 @@ export default function LandingPage() {
       className="flex min-h-screen w-full flex-col items-center justify-center bg-background text-center overflow-hidden p-4 opacity-0"
     >
         <div ref={titleGroupRef} className="absolute flex flex-col items-center gap-4 opacity-0">
-            <TradeVisionIcon ref={iconRef} className="h-24 w-24" />
+            <HsebliTradeIcon ref={iconRef} className="h-24 w-24" />
             <h1 ref={titleTextRef}
             className="font-headline text-5xl sm:text-7xl font-bold tracking-tighter text-foreground"
             >
-            TradeVision
+            HsebliTrade
             </h1>
         </div>
 
@@ -157,7 +157,7 @@ export default function LandingPage() {
 
          <div ref={creatorRef} className="absolute bottom-8 opacity-0">
             <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
-                <TradeVisionIcon className="h-5 w-5" />
+                <HsebliTradeIcon className="h-5 w-5" />
                 <span>Created by Mouaad Idoufkir</span>
             </Link>
         </div>

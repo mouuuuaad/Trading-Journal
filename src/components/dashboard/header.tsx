@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { TradeVisionIcon } from "../icons";
+import { HsebliTradeIcon } from "../icons";
 import { auth } from "@/lib/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -56,8 +56,8 @@ export function Header({ children }: HeaderProps) {
           href="/dashboard"
           className="flex items-center gap-2 text-lg font-semibold md:text-base"
         >
-          <TradeVisionIcon className="h-7 w-7" />
-          <span className="font-bold text-lg text-foreground">TradeVision</span>
+          <HsebliTradeIcon className="h-7 w-7" />
+          <span className="font-bold text-lg text-foreground">HsebliTrade</span>
         </Link>
         {navItems.map((item) => (
             <Link key={item.href} href={item.href} 
@@ -90,8 +90,8 @@ export function Header({ children }: HeaderProps) {
               href="/dashboard"
               className="flex items-center gap-2 text-lg font-semibold"
             >
-              <TradeVisionIcon className="h-6 w-6" />
-              <span>TradeVision</span>
+              <HsebliTradeIcon className="h-6 w-6" />
+              <span>HsebliTrade</span>
             </Link>
              {navItems.map((item) => (
                 <Link key={item.href} href={item.href} 

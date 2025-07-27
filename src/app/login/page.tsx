@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { TradeVisionIcon } from '@/components/icons';
+import { HsebliTradeIcon } from '@/components/icons';
 import { useForm, SubmitHandler } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +18,7 @@ import React from 'react';
 import { Metadata } from 'next';
 
 // export const metadata: Metadata = {
-//   title: "Login - TradeVision",
+//   title: "Login - HsebliTrade",
 //   description: "Access your personal trading journal.",
 // };
 
@@ -72,8 +72,8 @@ export default function LoginPage() {
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-muted/40 p-4">
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader className="text-center space-y-2">
-          <TradeVisionIcon className="mx-auto h-12 w-auto" />
-          <CardTitle className="font-headline text-3xl">TradeVision</CardTitle>
+          <HsebliTradeIcon className="mx-auto h-12 w-auto" />
+          <CardTitle className="font-headline text-3xl">HsebliTrade</CardTitle>
           <CardDescription>Enter your credentials to access your trading journal</CardDescription>
         </CardHeader>
         <CardContent>
@@ -114,7 +114,7 @@ export default function LoginPage() {
         </CardContent>
       </Card>
       <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
-          <TradeVisionIcon className="h-5 w-5" />
+          <HsebliTradeIcon className="h-5 w-5" />
           <span>Created by Mouaad Idoufkir</span>
       </Link>
     </div>

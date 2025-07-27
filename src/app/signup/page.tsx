@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { TradeVisionIcon } from '@/components/icons';
+import { HsebliTradeIcon } from '@/components/icons';
 import { useForm, SubmitHandler } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +18,7 @@ import React from 'react';
 import { Metadata } from 'next';
 
 // export const metadata: Metadata = {
-//   title: "Sign Up - TradeVision",
+//   title: "Sign Up - HsebliTrade",
 //   description: "Create a new account to start journaling your trades.",
 // };
 
@@ -73,9 +73,9 @@ export default function SignupPage() {
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-muted/40 p-4">
       <Card className="mx-auto w-full max-w-sm">
         <CardHeader className="text-center space-y-2">
-          <TradeVisionIcon className="mx-auto h-12 w-auto" />
+          <HsebliTradeIcon className="mx-auto h-12 w-auto" />
           <CardTitle className="font-headline text-3xl">Create Account</CardTitle>
-          <CardDescription>Enter your details to create a new TradeVision account</CardDescription>
+          <CardDescription>Enter your details to create a new HsebliTrade account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
@@ -120,7 +120,7 @@ export default function SignupPage() {
         </CardContent>
       </Card>
       <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
-          <TradeVisionIcon className="h-5 w-5" />
+          <HsebliTradeIcon className="h-5 w-5" />
           <span>Created by Mouaad Idoufkir</span>
       </Link>
     </div>

@@ -1,5 +1,5 @@
 
-export const TradeVisionIcon = (props: React.SVGProps<SVGSVGElement>) => (
+export const HsebliTradeIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         {...props}
         width="24"

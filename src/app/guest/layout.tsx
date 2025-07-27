@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Guest Access - TradeVision",
+  title: "Guest Access - HsebliTrade",
   description: "You are in guest mode. Please contact the administrator for full access.",
 };
 
