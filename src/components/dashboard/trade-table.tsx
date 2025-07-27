@@ -10,12 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -45,6 +39,7 @@ import {
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 interface TradeTableProps {
     trades: Trade[];
@@ -107,14 +102,14 @@ export function TradeTable({ trades }: TradeTableProps) {
   return (
     <>
     <Card>
-      <CardHeader className="px-4 pt-4 sm:px-6 sm:pt-6">
+      <CardHeader>
         <CardTitle className="font-semibold text-foreground text-base">Positions</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="border-border/40">
+              <TableRow className="border-border/40 hover:bg-transparent">
                 <TableHead>Symbol</TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead className="text-center">Result</TableHead>
@@ -127,12 +122,12 @@ export function TradeTable({ trades }: TradeTableProps) {
             <TableBody>
               {trades.length > 0 ? (
                   trades.map((trade) => (
-                    <TableRow key={trade.id} className="border-border/40">
+                    <TableRow key={trade.id} className="border-border/40 hover:bg-muted/40">
                       <TableCell>
                         <div className="font-medium text-foreground">{trade.asset}</div>
                         <div
                           className={cn(
-                            "text-sm text-muted-foreground",
+                            "text-sm",
                             trade.direction === "Buy" ? "text-primary" : "text-destructive"
                           )}
                         >
@@ -186,7 +181,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                   ))
               ) : (
                   <TableRow>
-                      <TableCell colSpan={5} className="text-center h-24">No trades logged yet.</TableCell>
+                      <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">No trades found for the selected period.</TableCell>
                   </TableRow>
               )}
             </TableBody>

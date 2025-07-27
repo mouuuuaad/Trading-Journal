@@ -2,12 +2,12 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Info } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 
 type StatsCardsProps = {
   stats: {
@@ -24,7 +24,7 @@ type StatsCardsProps = {
 
 
 const StatRow = ({ label, value }: { label: string; value: string | number }) => (
-  <div className="flex items-center justify-between text-sm">
+  <div className="flex items-baseline justify-between text-sm">
     <p className="text-muted-foreground">{label}</p>
     <p className="font-medium text-foreground">{value}</p>
   </div>
@@ -42,7 +42,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
     <Card className="h-full">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Statistics</CardTitle>
+          <CardTitle className="text-base font-semibold">Statistics</CardTitle>
           <Info className="h-4 w-4 text-muted-foreground" />
         </div>
       </CardHeader>
@@ -52,10 +52,10 @@ export function StatsCards({ stats }: StatsCardsProps) {
                 <div className="text-sm font-semibold text-primary">W {winRate.toFixed(0)}%</div>
                 <div className="text-sm font-semibold text-destructive">L {lossRate.toFixed(0)}%</div>
             </div>
-            <Progress value={winRate} className="h-2" />
+            <Progress value={winRate} className="h-1.5" />
         </div>
         
-        <div className="space-y-2">
+        <div className="space-y-2 text-sm">
             <StatRow label="Number of Winners" value={winningTrades} />
             <StatRow label="Number of Losers" value={losingTrades} />
             <StatRow label="Largest Win" value={`$${bestTradePnl.toFixed(2)}`} />
@@ -63,7 +63,9 @@ export function StatsCards({ stats }: StatsCardsProps) {
             <StatRow label="Average Gain/Loss" value={`$${avgTradePnl.toFixed(2)}`} />
         </div>
 
-        <div className="space-y-2 border-t pt-4">
+        <Separator />
+
+        <div className="space-y-2 text-sm">
             <StatRow label="Realized P&L" value={`$${totalPnl.toFixed(2)}`} />
             <StatRow label="Unrealized P&L" value={"$0.00"} />
             <StatRow label="Total P&L" value={`$${totalPnl.toFixed(2)}`} />

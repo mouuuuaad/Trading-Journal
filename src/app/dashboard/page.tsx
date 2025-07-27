@@ -28,7 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 
@@ -204,9 +203,9 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {isLoading ? (
                 <>
-                   <Skeleton className="lg:col-span-2 h-[350px]" />
-                   <Skeleton className="lg:col-span-1 h-[350px]" />
-                   <Skeleton className="lg:col-span-3 h-[350px]" />
+                   <Skeleton className="lg:col-span-2 h-[382px]" />
+                   <Skeleton className="lg:col-span-1 h-[382px]" />
+                   <Skeleton className="lg:col-span-3 h-[302px]" />
                    <Skeleton className="lg:col-span-3 h-[400px]" />
                 </>
             ) : (
