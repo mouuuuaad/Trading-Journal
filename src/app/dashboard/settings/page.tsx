@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/dashboard/header";
-import { Copy } from "lucide-react";
+import { Copy, Loader2, Share2 } from "lucide-react";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -61,12 +61,7 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const { setTheme, theme } = useTheme();
   const [shareableLink, setShareableLink] = React.useState("");
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined" && user) {
-        setShareableLink(`${window.location.origin}/share/${user.uid}`);
-    }
-  }, [user]);
+  const [isGeneratingLink, setIsGeneratingLink] = React.useState(false);
 
 
   const {
@@ -105,7 +100,32 @@ export default function SettingsPage() {
     }
   };
 
+  const handleGenerateLink = async () => {
+    setIsGeneratingLink(true);
+    try {
+        const response = await fetch('/api/share/generate', { method: 'POST' });
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to generate link");
+        }
+        
+        const link = `${window.location.origin}/share?token=${data.token}`;
+        setShareableLink(link);
+
+    } catch (error: any) {
+         toast({
+          title: "Error Generating Link",
+          description: error.message,
+          variant: "destructive",
+        });
+    } finally {
+        setIsGeneratingLink(false);
+    }
+  };
+
   const copyToClipboard = () => {
+    if (!shareableLink) return;
     navigator.clipboard.writeText(shareableLink).then(() => {
         toast({ title: "Copied to Clipboard", description: "Your shareable link has been copied." });
     }, (err) => {
@@ -270,19 +290,27 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle>Share Public Profile</CardTitle>
               <CardDescription>
-                Get a shareable, read-only link to your trading dashboard to show to others.
+                Generate a secure, read-only link to your trading dashboard. The link will expire after 10 minutes and can only be used once.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                 <div className="space-y-2">
-                    <Label htmlFor="share-link">Your Sharable Link</Label>
-                    <div className="flex gap-2">
-                        <Input id="share-link" type="text" readOnly value={shareableLink} className="bg-muted"/>
-                        <Button variant="outline" size="icon" onClick={copyToClipboard} aria-label="Copy link">
-                            <Copy className="h-4 w-4"/>
-                        </Button>
+                 <Button onClick={handleGenerateLink} disabled={isGeneratingLink}>
+                    {isGeneratingLink ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
+                    {isGeneratingLink ? "Generating Link..." : "Generate Secure Link"}
+                 </Button>
+
+                {shareableLink && (
+                    <div className="space-y-2 pt-4">
+                        <Label htmlFor="share-link">Your Secure Sharable Link</Label>
+                        <p className="text-sm text-muted-foreground">This link is valid for 10 minutes.</p>
+                        <div className="flex gap-2">
+                            <Input id="share-link" type="text" readOnly value={shareableLink} className="bg-muted"/>
+                            <Button variant="outline" size="icon" onClick={copyToClipboard} aria-label="Copy link">
+                                <Copy className="h-4 w-4"/>
+                            </Button>
+                        </div>
                     </div>
-                </div>
+                )}
             </CardContent>
           </Card>
         </TabsContent>

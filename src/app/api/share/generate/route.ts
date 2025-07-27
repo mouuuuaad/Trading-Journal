@@ -2,6 +2,8 @@
 import { NextResponse } from 'next/server';
 import admin from 'firebase-admin';
 import { getFirestore, Timestamp } from 'firebase-admin/firestore';
+import { headers } from 'next/headers';
+import { auth as clientAuth } from '@/lib/firebase'; // Using client auth to verify ID token
 
 // This tells Next.js to run this route dynamically
 export const dynamic = 'force-dynamic';
@@ -26,77 +28,33 @@ function getFirebaseAdmin() {
             credential: admin.credential.cert(serviceAccount)
         });
     }
-    const auth = admin.auth();
-    const db = getFirestore();
-    return { auth, db };
+    return { auth: admin.auth(), db: getFirestore() };
 }
 
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
-
-  if (!token) {
-    return NextResponse.json({ error: 'Share token is missing' }, { status: 400 });
-  }
-  
+export async function POST(request: Request) {
   try {
     const { auth, db } = getFirebaseAdmin();
-
-    const tokenQuery = db.collection("shareTokens").where("token", "==", token);
-    const tokenSnapshot = await tokenQuery.get();
-
-    if (tokenSnapshot.empty) {
-         return NextResponse.json({ error: 'This link is invalid or has already been used.' }, { status: 404 });
-    }
-
-    const tokenDoc = tokenSnapshot.docs[0];
-    const tokenData = tokenDoc.data();
     
-    // Check for expiration
-    const now = Timestamp.now();
-    if (tokenData.expiresAt.toMillis() < now.toMillis()) {
-        // Optionally delete the expired token
-        await tokenDoc.ref.delete();
-        return NextResponse.json({ error: 'This link has expired.' }, { status: 410 }); // 410 Gone
+    const authorization = headers().get('Authorization');
+    if (!authorization?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const idToken = authorization.split('Bearer ')[1];
+    const decodedToken = await auth.verifyIdToken(idToken);
+    const userId = decodedToken.uid;
 
-    const userId = tokenData.userId;
+    const token = admin.firestore.FieldValue.serverTimestamp().toString() + Math.random().toString(36).substring(2); // Simple unique token
+    const expiresAt = Timestamp.fromMillis(Date.now() + 10 * 60 * 1000); // 10 minutes from now
 
-    // 1. Fetch User Data
-    let userData = { displayName: "Anonymous User", photoURL: "" };
-    try {
-        const userRecord = await auth.getUser(userId);
-        userData = {
-            displayName: userRecord.displayName || "Anonymous User",
-            photoURL: userRecord.photoURL || ""
-        };
-    } catch (error) {
-        console.warn(`Could not fetch user data for ${userId}:`, error);
-    }
-
-    // 2. Fetch Trades
-    const tradesQuery = db.collection("trades").where("userId", "==", userId);
-    const tradesSnapshot = await tradesQuery.get();
-
-
-    const trades = tradesSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        date: data.date?.toDate ? data.date.toDate().toISOString() : new Date().toISOString(),
-      };
+    await db.collection('shareTokens').add({
+      userId,
+      token,
+      expiresAt,
     });
-    
-    // Delete the token after it has been used
-    await tokenDoc.ref.delete();
 
-    return NextResponse.json({ user: userData, trades });
-
-  } catch (error) {
-    console.error(`Error fetching share data for token ${token}:`, error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return NextResponse.json({ error: `A server error occurred while fetching the share data: ${errorMessage}` }, { status: 500 });
+    return NextResponse.json({ token });
+  } catch (error: any) {
+    console.error("Error generating share token:", error);
+    return NextResponse.json({ error: error.message || "Failed to generate share token" }, { status: 500 });
   }
 }
