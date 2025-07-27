@@ -13,6 +13,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Info } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type WeekdayPerformanceChartProps = {
   data: { name: string; pnl: number }[];
