@@ -29,8 +29,8 @@
     --destructive: 0 72% 51%; /* Vibrant Red */
     --destructive-foreground: 210 20% 98%;
     
-    --border: 228 9% 25%; /* Visible border color */
-    --input: 228 9% 25%;
+    --border: 228 9% 17%; /* Darker border to blend in */
+    --input: 228 9% 17%;
     --ring: 150 70% 45%;
     
     --radius: 0.5rem;
@@ -67,8 +67,8 @@
     --destructive: 0 72% 51%;
     --destructive-foreground: 210 20% 98%;
     
-    --border: 228 9% 25%;
-    --input: 228 9% 25%;
+    --border: 228 9% 17%;
+    --input: 228 9% 17%;
     --ring: 150 70% 45%;
 
     --chart-1: 22.1 83.1% 53.1%;
