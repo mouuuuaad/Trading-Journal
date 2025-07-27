@@ -125,7 +125,7 @@ function calculateStats(trades: Trade[]) {
   
   const weekdayPnl = [{ name: 'Mon', pnl: 0 }, { name: 'Tue', pnl: 0 }, { name: 'Wed', pnl: 0 }, { name: 'Thu', pnl: 0 }, { name: 'Fri', pnl: 0 }];
   trades.forEach(trade => {
-    const dayIndex = getDay(parseISO(trade.date as any));
+    const dayIndex = getDay(trade.date); // trade.date is already a Date object
     if (dayIndex >= 1 && dayIndex <= 5) {
         weekdayPnl[dayIndex - 1].pnl += trade.pnl;
     }
@@ -261,5 +261,3 @@ export default function SharePage() {
     </>
   );
 }
-
-    
