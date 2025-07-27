@@ -45,9 +45,11 @@ const tradeSchema = z.object({
   asset: z.string().min(1, "Asset is required"),
   direction: z.enum(["Buy", "Sell"]),
   entryPrice: z.coerce.number().positive("Entry price must be positive"),
-  stopLoss: z.coerce.number().positive("Stop loss must be positive"),
-  takeProfit: z.coerce.number().positive("Take profit must be positive"),
+  lotSize: z.coerce.number().positive("Lot size must be positive"),
+  stopLoss: z.coerce.number().optional(),
+  takeProfit: z.coerce.number().optional(),
   result: z.enum(["Win", "Loss", "BE"]),
+  pnl: z.coerce.number({invalid_type_error: "P/L is required"}),
   date: z.date(),
   notes: z.string().optional(),
   screenshotUrl: z.string().url().optional().or(z.literal('')),
@@ -78,6 +80,7 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
       asset: "",
       direction: "Buy",
       entryPrice: undefined,
+      lotSize: undefined,
       stopLoss: undefined,
       takeProfit: undefined,
       result: "Win",
@@ -95,15 +98,18 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
             entryPrice: tradeToEdit.entryPrice || undefined,
             stopLoss: tradeToEdit.stopLoss || undefined,
             takeProfit: tradeToEdit.takeProfit || undefined,
+            lotSize: tradeToEdit.lotSize || undefined,
         });
     } else if (open && !isEditMode) {
         reset({
           asset: "",
           direction: "Buy",
           entryPrice: undefined,
+          lotSize: undefined,
           stopLoss: undefined,
           takeProfit: undefined,
           result: "Win",
+          pnl: undefined,
           date: new Date(),
           notes: "",
           screenshotUrl: "",
@@ -112,32 +118,15 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
   }, [tradeToEdit, isEditMode, reset, open]);
 
 
-  const calculatePnl = (data: TradeFormValues) => {
-    let pnl = 0;
-    const pips = data.direction === 'Buy' 
-        ? data.takeProfit - data.entryPrice 
-        : data.entryPrice - data.takeProfit;
-    const riskPips = Math.abs(data.entryPrice - data.stopLoss);
-    
-    if (data.result === 'Win') {
-        pnl = pips;
-    } else if (data.result === 'Loss') {
-        pnl = -riskPips;
-    }
-    return pnl;
-  }
-
   const onSubmit = async (data: TradeFormValues) => {
     if (!user) {
         toast({ title: "Error", description: "You must be logged in to add a trade.", variant: "destructive" });
         return;
     }
 
-    const pnl = calculatePnl(data);
     const tradeData = { 
         userId: user.uid, 
         ...data, 
-        pnl,
         screenshotUrl: data.screenshotUrl || "",
         notes: data.notes || ""
     };
@@ -246,6 +235,15 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
               />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="lotSize" className="text-right">Lot Size</Label>
+              <Controller
+                name="lotSize"
+                control={control}
+                render={({ field }) => <Input id="lotSize" type="number" step="any" placeholder="0.01" className="col-span-3" {...field} value={field.value ?? ""} />}
+              />
+              {errors.lotSize && <p className="col-span-4 text-right text-sm text-destructive">{errors.lotSize.message}</p>}
+            </div>
+             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="entryPrice" className="text-right">Entry Price</Label>
               <Controller
                 name="entryPrice"
@@ -290,6 +288,15 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
                   </Select>
                 )}
               />
+            </div>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="pnl" className="text-right">P/L ($)</Label>
+              <Controller
+                name="pnl"
+                control={control}
+                render={({ field }) => <Input id="pnl" type="number" step="any" placeholder="250.50" className="col-span-3" {...field} value={field.value ?? ""} />}
+              />
+              {errors.pnl && <p className="col-span-4 text-right text-sm text-destructive">{errors.pnl.message}</p>}
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
                 <Label htmlFor="screenshotUrl" className="text-right pt-2">Screenshot URL</Label>
@@ -336,3 +343,5 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
     </Dialog>
   );
 }
+
+    

@@ -5,8 +5,9 @@ export type Trade = {
   asset: string;
   direction: 'Buy' | 'Sell';
   entryPrice: number;
-  stopLoss: number;
-  takeProfit: number;
+  lotSize?: number;
+  stopLoss?: number;
+  takeProfit?: number;
   result: 'Win' | 'Loss' | 'BE';
   pnl: number;
   notes?: string;
@@ -14,3 +15,5 @@ export type Trade = {
   userId: string;
   postAnalysis?: string;
 };
+
+    
