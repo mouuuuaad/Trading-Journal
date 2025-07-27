@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/dashboard/header";
+import { Copy } from "lucide-react";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -59,6 +60,14 @@ export default function SettingsPage() {
   const [user] = useAuthState(auth);
   const { toast } = useToast();
   const { setTheme, theme } = useTheme();
+  const [shareableLink, setShareableLink] = React.useState("");
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined" && user) {
+        setShareableLink(`${window.location.origin}/share/${user.uid}`);
+    }
+  }, [user]);
+
 
   const {
     register,
@@ -94,6 +103,14 @@ export default function SettingsPage() {
         });
       }
     }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(shareableLink).then(() => {
+        toast({ title: "Copied to Clipboard", description: "Your shareable link has been copied." });
+    }, (err) => {
+        toast({ title: "Failed to Copy", description: "Could not copy the link.", variant: "destructive"});
+    });
   };
 
   const handleDeleteAllTrades = async () => {
@@ -149,9 +166,10 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Manage your account, appearance, and data.</p>
       </div>
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full max-w-lg grid-cols-3">
+        <TabsList className="grid w-full max-w-lg grid-cols-4">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="sharing">Sharing</TabsTrigger>
           <TabsTrigger value="data">Data</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
@@ -244,6 +262,27 @@ export default function SettingsPage() {
                   </Label>
                 </div>
               </RadioGroup>
+            </CardContent>
+          </Card>
+        </TabsContent>
+         <TabsContent value="sharing">
+          <Card>
+            <CardHeader>
+              <CardTitle>Share Public Profile</CardTitle>
+              <CardDescription>
+                Get a shareable, read-only link to your trading dashboard to show to others.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="space-y-2">
+                    <Label htmlFor="share-link">Your Sharable Link</Label>
+                    <div className="flex gap-2">
+                        <Input id="share-link" type="text" readOnly value={shareableLink} className="bg-muted"/>
+                        <Button variant="outline" size="icon" onClick={copyToClipboard} aria-label="Copy link">
+                            <Copy className="h-4 w-4"/>
+                        </Button>
+                    </div>
+                </div>
             </CardContent>
           </Card>
         </TabsContent>
