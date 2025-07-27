@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useParams } from 'next/navigation';
 import { Trade } from "@/lib/types";
 import {
   startOfToday,
@@ -200,7 +201,8 @@ const getInitials = (name: string | null | undefined) => {
     return names[0][0];
 };
 
-export default function SharePage({ params }: { params: { userId: string } }) {
+export default function SharePage() {
+  const params = useParams();
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -214,7 +216,7 @@ export default function SharePage({ params }: { params: { userId: string } }) {
   });
 
   useEffect(() => {
-    const userId = params.userId;
+    const userId = params.userId as string;
     if (!userId) return;
 
     const fetchData = async () => {
@@ -373,3 +375,4 @@ export default function SharePage({ params }: { params: { userId: string } }) {
     </>
   );
 }
+
