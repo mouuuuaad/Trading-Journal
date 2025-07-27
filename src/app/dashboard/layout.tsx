@@ -7,6 +7,7 @@ import Link from "next/link";
 import { HsebliTradeIcon } from "@/components/icons";
 import { Metadata } from "next";
 import { TickerTape } from "@/components/dashboard/ticker-tape";
+import { NewsButton } from "@/components/dashboard/news-button";
 
 export const metadata: Metadata = {
   title: "Dashboard - HsebliTrade",
@@ -40,6 +41,7 @@ export default function DashboardLayout({
             <div className="fixed bottom-0 left-0 right-0 w-full z-50">
                 <TickerTape />
             </div>
+             <NewsButton />
           </footer>
         </div>
         <Toaster />
