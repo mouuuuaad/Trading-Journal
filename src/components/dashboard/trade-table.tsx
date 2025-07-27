@@ -101,11 +101,8 @@ export function TradeTable({ trades }: TradeTableProps) {
 
   return (
     <>
-    <Card>
-      <CardHeader>
-        <CardTitle className="font-semibold text-foreground text-base">Positions</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
+    <div className="space-y-4">
+        <h2 className="text-base font-semibold text-foreground">Positions</h2>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -147,7 +144,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                               ? "destructive"
                               : "secondary"
                           }
-                          className="w-[50px] justify-center"
+                          className={cn("w-[50px] justify-center",  trade.result === 'Win' ? 'bg-primary text-primary-foreground hover:bg-primary/80' : '')}
                         >
                           {trade.result}
                         </Badge>
@@ -187,8 +184,7 @@ export function TradeTable({ trades }: TradeTableProps) {
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-    </Card>
+    </div>
     {selectedTradeDetails && (
         <TradeDetailsModal
             isOpen={isDetailsModalOpen}

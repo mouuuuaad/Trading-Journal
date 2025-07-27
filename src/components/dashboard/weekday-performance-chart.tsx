@@ -40,11 +40,11 @@ export function WeekdayPerformanceChart({ data }: WeekdayPerformanceChartProps) 
               <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} stroke="hsl(var(--muted-foreground))" />
               <Tooltip
                 cursor={false}
-                content={<ChartTooltipContent indicator="dot" />}
+                content={<ChartTooltipContent indicator="dot" formatter={(value, name) => <div>{name}: <span className={cn("font-bold", Number(value) >= 0 ? "text-primary": "text-destructive")}>${Number(value).toFixed(2)}</span></div>}/>}
               />
               <Bar dataKey="pnl" radius={2}>
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.pnl >= 0 ? "hsl(var(--chart-2))" : "hsl(var(--destructive))"} />
+                  <Cell key={`cell-${index}`} fill={entry.pnl >= 0 ? "hsl(var(--primary))" : "hsl(var(--destructive))"} />
                 ))}
               </Bar>
             </BarChart>

@@ -88,12 +88,12 @@ function calculateStats(trades: Trade[]) {
   const losingTrades = trades.filter((trade) => trade.result === "Loss").length;
   const beTrades = trades.filter((trade) => trade.result === "BE").length;
 
-  const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
+  const winRate = winningTrades + losingTrades > 0 ? (winningTrades / (winningTrades + losingTrades)) * 100 : 0;
   
   const avgTradePnl = totalTrades > 0 ? totalPnl / totalTrades : 0;
 
-  const bestTradePnl = trades.length > 0 ? Math.max(...trades.map(t => t.pnl)) : 0;
-  const worstTradePnl = trades.length > 0 ? Math.min(...trades.map(t => t.pnl)) : 0;
+  const bestTradePnl = trades.length > 0 ? Math.max(0, ...trades.map(t => t.pnl)) : 0;
+  const worstTradePnl = trades.length > 0 ? Math.min(0, ...trades.map(t => t.pnl)) : 0;
 
     const totalReward = trades.filter(t => t.result === 'Win').reduce((acc, trade) => acc + Math.abs(trade.takeProfit - trade.entryPrice), 0);
     const totalRisk = trades.filter(t => t.result === 'Loss').reduce((acc, trade) => acc + Math.abs(trade.entryPrice - trade.stopLoss), 0);
