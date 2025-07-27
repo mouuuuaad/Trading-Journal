@@ -190,7 +190,7 @@ export default function SharePage() {
   if (isLoading) {
       return (
          <main className="flex-1 p-4 sm:p-6 md:p-8">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 {[...Array(4)].map((_,i) => <Skeleton key={i} className="h-28" />)}
             </div>
              <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-7">

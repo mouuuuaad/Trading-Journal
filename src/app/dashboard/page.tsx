@@ -6,7 +6,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, query, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
-import { Header } from "@/components/dashboard/header";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { WinLossChart } from "@/components/dashboard/win-loss-chart";
@@ -25,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ExportButton } from "@/components/dashboard/export-button";
 import { TradeFilters } from "@/components/dashboard/trade-filters";
 import { AddTradeModal } from "@/components/dashboard/add-trade-modal";
+import { Header } from "@/components/dashboard/header";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 type FilterType = "asset" | "result" | "direction";
@@ -246,13 +246,13 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Header>
-        <AddTradeModal />
-        <ExportButton trades={filteredTrades} stats={stats} user={user} />
-      </Header>
       <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
+        <div className="flex items-center justify-end gap-2 no-print">
+            <AddTradeModal />
+            <ExportButton trades={filteredTrades} stats={stats} user={user} />
+        </div>
         {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Skeleton className="h-28" />
               <Skeleton className="h-28" />
               <Skeleton className="h-28" />
@@ -273,7 +273,7 @@ export default function DashboardPage() {
             />
         )}
 
-        <div className="grid gap-4 md:gap-8">
+        <div className="grid gap-4 md:gap-8 lg:grid-cols-1">
           {isLoading ? (
             <>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -311,5 +311,3 @@ export default function DashboardPage() {
     </>
   );
 }
-
-    

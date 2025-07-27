@@ -7,7 +7,6 @@ import { useCollection } from "react-firebase-hooks/firestore";
 import { collection, query, where, doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { Trade } from "@/lib/types";
-import { Header } from "@/components/dashboard/header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,14 @@ import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
+import { Metadata } from "next";
+
+// This component now sets its own metadata
+// export const metadata: Metadata = {
+//   title: "Trade Review - TradeVision",
+//   description: "Review your past trades one-by-one to learn and improve.",
+// };
+
 
 const DetailRow = ({ label, value, valueClassName }: { label: string; value: React.ReactNode; valueClassName?: string }) => (
     <div className="flex flex-col sm:flex-row justify-between border-b py-2 text-sm sm:items-center">
@@ -107,7 +114,6 @@ export default function ReviewPage() {
 
     return (
         <>
-            <Header />
             <main className="flex-1 space-y-4 p-4 sm:p-6 md:p-8">
                 <div className="space-y-2">
                     <h1 className="font-headline text-2xl font-bold tracking-tight md:text-3xl">Trade Review</h1>

@@ -15,6 +15,12 @@ import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
+import { Metadata } from 'next';
+
+// export const metadata: Metadata = {
+//   title: "Sign Up - TradeVision",
+//   description: "Create a new account to start journaling your trades.",
+// };
 
 const signupSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),

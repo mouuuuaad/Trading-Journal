@@ -15,7 +15,12 @@ import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
+import { Metadata } from 'next';
 
+// export const metadata: Metadata = {
+//   title: "Login - TradeVision",
+//   description: "Access your personal trading journal.",
+// };
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),

@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -45,7 +46,7 @@ const dateRangeOptions = [
 export function StatsCards({ totalPnl, winRate, winningTrades, totalTrades, rrRatio, dateRange, setDateRange, avgPnl, bestTrade, worstTrade }: StatsCardsProps) {
   const selectedLabel = dateRangeOptions.find(opt => opt.value === dateRange)?.label || "All Time";
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
       {/* Date Range */}
        <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

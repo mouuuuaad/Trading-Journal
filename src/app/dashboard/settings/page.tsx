@@ -45,8 +45,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Header } from "@/components/dashboard/header";
 import { Copy, Loader2, Share2 } from "lucide-react";
+import { Metadata } from "next";
+
+// export const metadata: Metadata = {
+//   title: "Settings - TradeVision",
+//   description: "Manage your account, appearance, and data settings.",
+// };
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -193,8 +198,6 @@ export default function SettingsPage() {
 
 
   return (
-    <>
-    <Header/>
     <main className="flex-1 space-y-4 p-4 sm:p-6 md:p-8">
       <div className="space-y-2">
         <h1 className="font-headline text-2xl font-bold tracking-tight md:text-3xl">Settings</h1>
@@ -370,8 +373,5 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </main>
-    </>
   );
 }
-
-    

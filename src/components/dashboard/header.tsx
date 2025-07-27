@@ -19,7 +19,8 @@ import { TradeVisionIcon } from "../icons";
 import { auth } from "@/lib/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 type HeaderProps = {
   children?: React.ReactNode;
@@ -28,6 +29,7 @@ type HeaderProps = {
 export function Header({ children }: HeaderProps) {
   const [user] = useAuthState(auth);
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     auth.signOut();
@@ -42,6 +44,11 @@ export function Header({ children }: HeaderProps) {
     return names[0][0];
   };
 
+  const navItems = [
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/dashboard/review", label: "Review" },
+    { href: "/dashboard/settings", label: "Settings" },
+  ];
 
   return (
     <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-10 no-print">
@@ -53,15 +60,16 @@ export function Header({ children }: HeaderProps) {
           <TradeVisionIcon className="h-6 w-6" />
           <span className="sr-only">TradeVision</span>
         </Link>
-        <Link href="/dashboard" className="text-foreground transition-colors hover:text-foreground/80">
-            <h1 className="font-headline text-xl text-foreground">Dashboard</h1>
-        </Link>
-         <Link
-          href="/dashboard/review"
-          className="text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Review
-        </Link>
+        {navItems.map((item) => (
+            <Link key={item.href} href={item.href} 
+              className={cn(
+                "transition-colors hover:text-foreground",
+                pathname === item.href ? "text-foreground font-semibold" : "text-muted-foreground"
+              )}
+            >
+              {item.label}
+            </Link>
+        ))}
       </nav>
       <Sheet>
         <SheetTrigger asChild>
@@ -86,30 +94,22 @@ export function Header({ children }: HeaderProps) {
               <TradeVisionIcon className="h-6 w-6" />
               <span>TradeVision</span>
             </Link>
-            <Link href="/dashboard" className="hover:text-foreground">
-              Dashboard
-            </Link>
-            <Link href="/dashboard/review" className="text-muted-foreground hover:text-foreground">
-              Review
-            </Link>
-             <Link
-              href="/dashboard/settings"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Settings
-            </Link>
+             {navItems.map((item) => (
+                <Link key={item.href} href={item.href} 
+                className={cn(
+                    "transition-colors hover:text-foreground",
+                    pathname === item.href ? "text-foreground" : "text-muted-foreground"
+                )}
+                >
+                {item.label}
+                </Link>
+            ))}
           </nav>
         </SheetContent>
       </Sheet>
       <div className="flex w-full items-center gap-2 md:ml-auto md:gap-4">
         <div className="ml-auto flex-1 sm:flex-initial" />
-        {children}
-        <Link href="/dashboard/settings" className="hidden sm:flex">
-          <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">
-              <Settings className="h-5 w-5" />
-              <span className="sr-only">Settings</span>
-          </Button>
-        </Link>
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full h-9 w-9">
@@ -123,7 +123,6 @@ export function Header({ children }: HeaderProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>{user?.displayName || user?.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/dashboard/review')}>Review</DropdownMenuItem>
             <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>Settings</DropdownMenuItem>
             <DropdownMenuItem>Support</DropdownMenuItem>
             <DropdownMenuSeparator />

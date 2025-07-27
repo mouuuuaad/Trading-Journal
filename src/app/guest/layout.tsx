@@ -1,4 +1,11 @@
+
 import { Toaster } from "@/components/ui/toaster";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Guest Access - TradeVision",
+  description: "You are in guest mode. Please contact the administrator for full access.",
+};
 
 export default function GuestLayout({
   children,
