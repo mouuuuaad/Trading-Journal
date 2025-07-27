@@ -122,13 +122,16 @@ export function TradeTable({ trades }: TradeTableProps) {
                     <TableRow key={trade.id} className="border-border/40 hover:bg-muted/40">
                       <TableCell>
                         <div className="font-medium text-foreground">{trade.asset}</div>
-                        <div
-                          className={cn(
-                            "text-sm",
-                            trade.direction === "Buy" ? "text-primary" : "text-destructive"
-                          )}
-                        >
-                          {trade.direction}
+                        <div className="flex items-center gap-2">
+                            <div
+                            className={cn(
+                                "text-sm font-semibold",
+                                trade.direction === "Buy" ? "text-primary" : "text-destructive"
+                            )}
+                            >
+                            {trade.direction}
+                            </div>
+                            <span className="text-xs text-muted-foreground">({trade.lotSize})</span>
                         </div>
                       </TableCell>
                        <TableCell>
