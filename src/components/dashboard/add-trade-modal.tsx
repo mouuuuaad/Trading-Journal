@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,9 +31,10 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { auth, db } from "@/lib/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Textarea } from "../ui/textarea";
+import { Trade } from "@/lib/types";
 
 const popularAssets = [
   "EUR/USD", "GBP/USD", "USD/JPY", "USD/CAD", "AUD/USD",
@@ -54,10 +55,23 @@ const tradeSchema = z.object({
 
 type TradeFormValues = z.infer<typeof tradeSchema>;
 
-export function AddTradeModal() {
-  const [open, setOpen] = useState(false);
+interface AddTradeModalProps {
+  tradeToEdit?: Trade | null;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [user] = useAuthState(auth);
   const { toast } = useToast();
+
+  const isControlled = isOpen !== undefined && onOpenChange !== undefined;
+  const open = isControlled ? isOpen : internalOpen;
+  const setOpen = isControlled ? onOpenChange : setInternalOpen;
+  
+  const isEditMode = !!tradeToEdit;
+
   const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm<TradeFormValues>({
     resolver: zodResolver(tradeSchema),
     defaultValues: {
@@ -73,59 +87,80 @@ export function AddTradeModal() {
     },
   });
 
+  useEffect(() => {
+    if (isEditMode) {
+        reset({
+            ...tradeToEdit,
+            entryPrice: tradeToEdit.entryPrice || undefined,
+            stopLoss: tradeToEdit.stopLoss || undefined,
+            takeProfit: tradeToEdit.takeProfit || undefined,
+        });
+    } else {
+        reset(); // Reset to default values for add mode
+    }
+  }, [tradeToEdit, isEditMode, reset, open]);
+
+
+  const calculatePnl = (data: TradeFormValues) => {
+    let pnl = 0;
+    const risk = Math.abs(data.entryPrice - data.stopLoss);
+    
+    if (data.result === 'Win') {
+        const reward = Math.abs(data.takeProfit - data.entryPrice);
+        pnl = reward;
+    } else if (data.result === 'Loss') {
+        pnl = -risk;
+    }
+    return pnl;
+  }
+
   const onSubmit = async (data: TradeFormValues) => {
     if (!user) {
         toast({ title: "Error", description: "You must be logged in to add a trade.", variant: "destructive" });
         return;
     }
 
-    let pnl = 0;
-    const risk = Math.abs(data.entryPrice - data.stopLoss);
-    
-    if (data.result === 'Win') {
-        const reward = Math.abs(data.takeProfit - data.entryPrice);
-        pnl = data.direction === 'Buy' ? reward : reward;
-    } else if (data.result === 'Loss') {
-        pnl = -risk;
-    }
+    const pnl = calculatePnl(data);
+    const tradeData = { userId: user.uid, ...data, pnl };
 
     try {
-      await addDoc(collection(db, "trades"), {
-        userId: user.uid,
-        ...data,
-        pnl,
-      });
-
-      toast({
-        title: "Trade Logged",
-        description: `Successfully added trade for ${data.asset}.`,
-      });
+      if (isEditMode) {
+        const tradeRef = doc(db, "trades", tradeToEdit.id);
+        await updateDoc(tradeRef, tradeData);
+        toast({ title: "Trade Updated", description: `Successfully updated trade for ${data.asset}.` });
+      } else {
+        await addDoc(collection(db, "trades"), tradeData);
+        toast({ title: "Trade Logged", description: `Successfully added trade for ${data.asset}.` });
+      }
+      
       reset();
       setOpen(false);
     } catch (error: any) {
         toast({
-            title: "Error saving trade",
+            title: isEditMode ? "Error updating trade" : "Error saving trade",
             description: error.message,
             variant: "destructive",
         });
     }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="h-9 gap-1">
+  const trigger = !isEditMode ? (
+     <Button size="sm" className="h-9 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             Add Trade
           </span>
         </Button>
-      </DialogTrigger>
+  ) : null;
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+        {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle className="font-headline">Log New Trade</DialogTitle>
+          <DialogTitle className="font-headline">{isEditMode ? "Edit Trade" : "Log New Trade"}</DialogTitle>
           <DialogDescription>
-            Fill in the details of your trade. Click save when you're done.
+            {isEditMode ? "Update the details of your trade." : "Fill in the details of your trade. Click save when you're done."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -136,7 +171,7 @@ export function AddTradeModal() {
                 name="asset"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Select an asset" />
                     </SelectTrigger>
@@ -179,7 +214,7 @@ export function AddTradeModal() {
                 name="direction"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Select direction" />
                     </SelectTrigger>
@@ -224,7 +259,7 @@ export function AddTradeModal() {
                 name="result"
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger className="col-span-3">
                       <SelectValue placeholder="Select result" />
                     </SelectTrigger>
@@ -248,6 +283,7 @@ export function AddTradeModal() {
                         placeholder="https://example.com/image.png"
                         className="col-span-3"
                         {...field}
+                         value={field.value ?? ""}
                     />
                     )}
                 />
@@ -264,6 +300,7 @@ export function AddTradeModal() {
                     placeholder="Enter your thoughts on the trade, strategy, emotions, etc."
                     className="col-span-3"
                     {...field}
+                    value={field.value ?? ""}
                   />
                 )}
               />
@@ -272,7 +309,7 @@ export function AddTradeModal() {
           <DialogFooter>
              <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
             <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Trade"}
+                {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>

@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { TradeVisionIcon } from "../icons";
-import { AddTradeModal } from "./add-trade-modal";
 import { auth } from "@/lib/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -103,9 +102,7 @@ export function Header({ children }: HeaderProps) {
         </SheetContent>
       </Sheet>
       <div className="flex w-full items-center gap-2 md:ml-auto md:gap-4">
-        <div className="ml-auto flex-1 sm:flex-initial">
-            <AddTradeModal />
-        </div>
+        <div className="ml-auto flex-1 sm:flex-initial" />
         {children}
         <Link href="/dashboard/settings" className="hidden sm:flex">
           <Button variant="ghost" size="icon" className="rounded-full h-9 w-9">

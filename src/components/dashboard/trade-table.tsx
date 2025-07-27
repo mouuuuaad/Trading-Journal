@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
@@ -31,19 +32,79 @@ import { cn } from "@/lib/utils";
 import { Trade } from "@/lib/types";
 import { format } from "date-fns";
 import { TradeDetailsModal } from "./trade-details-modal";
+import { AddTradeModal } from "./add-trade-modal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { deleteDoc, doc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useToast } from "@/hooks/use-toast";
 
 interface TradeTableProps {
     trades: Trade[];
 }
 
 export function TradeTable({ trades }: TradeTableProps) {
-  const [selectedTrade, setSelectedTrade] = React.useState<Trade | null>(null);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [selectedTradeDetails, setSelectedTradeDetails] = React.useState<Trade | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = React.useState(false);
+
+  const [tradeToEdit, setTradeToEdit] = React.useState<Trade | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false);
+
+  const [tradeToDelete, setTradeToDelete] = React.useState<Trade | null>(null);
+  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = React.useState(false);
+
+  const { toast } = useToast();
+
 
   const handleViewDetails = (trade: Trade) => {
-    setSelectedTrade(trade);
-    setIsModalOpen(true);
+    setSelectedTradeDetails(trade);
+    setIsDetailsModalOpen(true);
   };
+
+  const handleEdit = (trade: Trade) => {
+    setTradeToEdit(trade);
+    setIsEditModalOpen(true);
+  };
+  
+  const handleDeleteClick = (trade: Trade) => {
+    setTradeToDelete(trade);
+    setIsDeleteAlertOpen(true);
+  };
+  
+  const handleDeleteConfirm = async () => {
+    if (!tradeToDelete) return;
+    try {
+        await deleteDoc(doc(db, "trades", tradeToDelete.id));
+        toast({
+            title: "Trade Deleted",
+            description: `The trade for ${tradeToDelete.asset} has been successfully deleted.`,
+        });
+    } catch (error: any) {
+        toast({
+            title: "Error Deleting Trade",
+            description: error.message,
+            variant: "destructive",
+        });
+    } finally {
+        setIsDeleteAlertOpen(false);
+        setTradeToDelete(null);
+    }
+  };
+
+
+  React.useEffect(() => {
+    if (!isEditModalOpen) {
+        setTradeToEdit(null);
+    }
+  }, [isEditModalOpen])
 
   return (
     <>
@@ -118,8 +179,9 @@ export function TradeTable({ trades }: TradeTableProps) {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => handleViewDetails(trade)}>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive">Delete</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(trade)}>Edit</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive focus:text-destructive-foreground focus:bg-destructive" onClick={() => handleDeleteClick(trade)}>Delete</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -135,13 +197,37 @@ export function TradeTable({ trades }: TradeTableProps) {
         </div>
       </CardContent>
     </Card>
-    {selectedTrade && (
+    {selectedTradeDetails && (
         <TradeDetailsModal
-            isOpen={isModalOpen}
-            onOpenChange={setIsModalOpen}
-            trade={selectedTrade}
+            isOpen={isDetailsModalOpen}
+            onOpenChange={setIsDetailsModalOpen}
+            trade={selectedTradeDetails}
         />
     )}
+    {isEditModalOpen && (
+        <AddTradeModal
+            isOpen={isEditModalOpen}
+            onOpenChange={setIsEditModalOpen}
+            tradeToEdit={tradeToEdit}
+        />
+    )}
+    <AlertDialog open={isDeleteAlertOpen} onOpenChange={setIsDeleteAlertOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the trade for <span className="font-semibold">{tradeToDelete?.asset}</span> on <span className="font-semibold">{tradeToDelete ? format(tradeToDelete.date, 'PPP') : ''}</span>.
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Yes, delete trade
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+
     </>
   );
 }

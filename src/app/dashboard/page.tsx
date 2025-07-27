@@ -24,6 +24,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExportButton } from "@/components/dashboard/export-button";
 import { TradeFilters } from "@/components/dashboard/trade-filters";
+import { AddTradeModal } from "@/components/dashboard/add-trade-modal";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 type FilterType = "asset" | "result" | "direction";
@@ -246,6 +247,7 @@ export default function DashboardPage() {
   return (
     <>
       <Header>
+        <AddTradeModal />
         <ExportButton trades={filteredTrades} stats={stats} user={user} />
       </Header>
       <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
