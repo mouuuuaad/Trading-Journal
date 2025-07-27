@@ -1,8 +1,8 @@
 
 import { NextResponse } from 'next/server';
 import admin from 'firebase-admin';
-import { collection, query, where, getDocs, getFirestore } from "firebase-admin/firestore";
 import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
 
 // This tells Next.js to run this route dynamically
 export const dynamic = 'force-dynamic';
@@ -54,11 +54,9 @@ export async function GET(request: Request, { params }: { params: { userId: stri
     }
 
     // 2. Fetch Trades
-    const tradesQuery = query(
-      collection(db, "trades"),
-      where("userId", "==", userId)
-    );
-    const tradesSnapshot = await getDocs(tradesQuery);
+    const tradesQuery = db.collection("trades").where("userId", "==", userId);
+    const tradesSnapshot = await tradesQuery.get();
+
 
     const trades = tradesSnapshot.docs.map(doc => {
       const data = doc.data();
