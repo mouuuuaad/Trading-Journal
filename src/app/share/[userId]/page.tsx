@@ -201,7 +201,6 @@ const getInitials = (name: string | null | undefined) => {
 };
 
 export default function SharePage({ params }: { params: { userId: string } }) {
-  const { userId } = params;
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -215,6 +214,7 @@ export default function SharePage({ params }: { params: { userId: string } }) {
   });
 
   useEffect(() => {
+    const userId = params.userId;
     if (!userId) return;
 
     const fetchData = async () => {
@@ -244,7 +244,7 @@ export default function SharePage({ params }: { params: { userId: string } }) {
     };
 
     fetchData();
-  }, [userId]);
+  }, [params.userId]);
 
 
   const handleFilterChange = (filterType: FilterType, value: string) => {
