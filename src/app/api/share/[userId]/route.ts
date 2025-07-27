@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { getFirebaseAdmin } from '@/lib/firebase-admin';
+import { db, auth } from '@/lib/firebase-admin';
 
 // This tells Next.js to run this route dynamically
 export const dynamic = 'force-dynamic';
 
-
 export async function GET(request: Request, { params }: { params: { userId: string } }) {
   const { userId } = params;
-  const { db, auth } = getFirebaseAdmin();
 
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
@@ -39,6 +37,7 @@ export async function GET(request: Request, { params }: { params: { userId: stri
       return {
         id: doc.id,
         ...data,
+        // Ensure date is serialized in a consistent format (ISO string)
         date: data.date?.toDate ? data.date.toDate().toISOString() : new Date().toISOString(),
       };
     });

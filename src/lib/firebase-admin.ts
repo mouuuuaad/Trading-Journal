@@ -15,22 +15,13 @@ const serviceAccount = {
   "universe_domain": "googleapis.com"
 };
 
-let db: admin.firestore.Firestore;
-let auth: admin.auth.Auth;
-
-function initializeFirebaseAdmin() {
-    if (!admin.apps.length) {
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
-    }
-    db = admin.firestore();
-    auth = admin.auth();
+if (!admin.apps.length) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
 }
 
-export function getFirebaseAdmin() {
-    if (!db || !auth) {
-        initializeFirebaseAdmin();
-    }
-    return { db, auth };
-}
+const db = admin.firestore();
+const auth = admin.auth();
+
+export { db, auth };
