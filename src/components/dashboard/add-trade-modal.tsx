@@ -88,15 +88,26 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
   });
 
   useEffect(() => {
-    if (isEditMode) {
+    if (open && isEditMode && tradeToEdit) {
         reset({
             ...tradeToEdit,
+            date: tradeToEdit.date ? new Date(tradeToEdit.date) : new Date(),
             entryPrice: tradeToEdit.entryPrice || undefined,
             stopLoss: tradeToEdit.stopLoss || undefined,
             takeProfit: tradeToEdit.takeProfit || undefined,
         });
-    } else {
-        reset(); // Reset to default values for add mode
+    } else if (open && !isEditMode) {
+        reset({
+          asset: "",
+          direction: "Buy",
+          entryPrice: undefined,
+          stopLoss: undefined,
+          takeProfit: undefined,
+          result: "Win",
+          date: new Date(),
+          notes: "",
+          screenshotUrl: "",
+        });
     }
   }, [tradeToEdit, isEditMode, reset, open]);
 
@@ -121,7 +132,13 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
     }
 
     const pnl = calculatePnl(data);
-    const tradeData = { userId: user.uid, ...data, pnl };
+    const tradeData = { 
+        userId: user.uid, 
+        ...data, 
+        pnl,
+        screenshotUrl: data.screenshotUrl || "",
+        notes: data.notes || ""
+    };
 
     try {
       if (isEditMode) {
@@ -307,7 +324,7 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
             </div>
           </div>
           <DialogFooter>
-             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
             <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
@@ -317,3 +334,5 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
     </Dialog>
   );
 }
+
+    
