@@ -19,19 +19,13 @@ const serviceAccount: ServiceAccount = {
   "universe_domain": "googleapis.com"
 };
 
-// This function ensures we initialize the app only once and returns the services
-function getFirebaseAdmin() {
-  if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
-  }
-  
-  // Return the services from the initialized app
-  return { 
-    db: admin.firestore(), 
-    auth: admin.auth() 
-  };
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
 }
 
-export { getFirebaseAdmin };
+const db = admin.firestore();
+const auth = admin.auth();
+
+export { db, auth };

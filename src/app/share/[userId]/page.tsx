@@ -2,7 +2,7 @@
 import { ShareClientPage } from './share-client-page';
 import { Trade } from "@/lib/types";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { getFirebaseAdmin } from "@/lib/firebase-admin"; // Using admin SDK for server-side access
+import { db, auth } from "@/lib/firebase-admin"; // Using admin SDK for server-side access
 
 type User = {
     displayName?: string;
@@ -19,8 +19,6 @@ type ShareData = {
 // It can fetch data directly on the server.
 async function getShareData(userId: string): Promise<ShareData> {
     try {
-        const { db, auth } = getFirebaseAdmin();
-
         // 1. Fetch User Data using the Admin SDK
         let userData: User = { displayName: "Anonymous User", photoURL: "" };
         try {
