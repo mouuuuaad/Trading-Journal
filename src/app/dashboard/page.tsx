@@ -8,7 +8,6 @@ import { collection, query, where } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
-import { WinLossChart } from "@/components/dashboard/win-loss-chart";
 import { WeekdayPerformanceChart } from "@/components/dashboard/weekday-performance-chart";
 import { TradeTable } from "@/components/dashboard/trade-table";
 import { Trade } from "@/lib/types";
@@ -21,18 +20,21 @@ import {
   getDay,
 } from 'date-fns';
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExportButton } from "@/components/dashboard/export-button";
-import { TradeFilters } from "@/components/dashboard/trade-filters";
 import { AddTradeModal } from "@/components/dashboard/add-trade-modal";
-import { Header } from "@/components/dashboard/header";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
-type FilterType = "asset" | "result" | "direction";
 
 function filterTrades(
     trades: Trade[],
     dateRange: DateRange,
-    filters: { asset: string; result: string; direction: string }
 ): Trade[] {
   const now = new Date();
   let startDate: Date;
@@ -53,34 +55,12 @@ function filterTrades(
     case 'all':
     default:
       // No date filtering
-      break;
+      return trades;
   }
 
   return trades.filter(trade => {
-    // Date Range Filter
-    if (dateRange !== 'all') {
-        const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
-        if (tradeDate < startDate) {
-            return false;
-        }
-    }
-
-    // Asset Filter
-    if (filters.asset !== 'all' && trade.asset !== filters.asset) {
-        return false;
-    }
-
-    // Result Filter
-    if (filters.result !== 'all' && trade.result !== filters.result) {
-        return false;
-    }
-
-    // Direction Filter
-    if (filters.direction !== 'all' && trade.direction !== filters.direction) {
-        return false;
-    }
-
-    return true;
+    const tradeDate = typeof trade.date === 'string' ? parseISO(trade.date) : trade.date;
+    return tradeDate >= startDate;
   });
 }
 
@@ -91,18 +71,11 @@ function calculateStats(trades: Trade[]) {
       winRate: 0,
       winningTrades: 0,
       losingTrades: 0,
-      beTrades: 0,
       totalTrades: 0,
-      rrRatio: 0,
-      avgPnl: 0,
-      bestTrade: null,
-      worstTrade: null,
+      bestTradePnl: 0,
+      worstTradePnl: 0,
+      avgTradePnl: 0,
       performanceData: [],
-      winLossData: [
-        { name: 'Wins', value: 0, fill: "hsl(var(--chart-2))" },
-        { name: 'Losses', value: 0, fill: "hsl(var(--destructive))" },
-        { name: 'Break Even', value: 0, fill: "hsl(var(--muted-foreground))" },
-      ],
       weekdayPerformance: [],
     };
   }
@@ -111,29 +84,13 @@ function calculateStats(trades: Trade[]) {
   const totalTrades = trades.length;
   const winningTrades = trades.filter((trade) => trade.result === "Win").length;
   const losingTrades = trades.filter((trade) => trade.result === "Loss").length;
-  const beTrades = trades.filter((trade) => trade.result === "BE").length;
 
   const winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0;
+  
+  const avgTradePnl = totalTrades > 0 ? totalPnl / totalTrades : 0;
 
-  const totalReward = trades.filter(t => t.result === 'Win').reduce((acc, trade) => {
-      const reward = Math.abs(trade.takeProfit - trade.entryPrice);
-      return acc + reward;
-  }, 0);
-
-  const totalRisk = trades.filter(t => t.result === 'Loss').reduce((acc, trade) => {
-      const risk = Math.abs(trade.entryPrice - trade.stopLoss);
-      return acc + risk;
-  }, 0);
-
-  const averageReward = winningTrades > 0 ? totalReward / winningTrades : 0;
-  const averageRisk = losingTrades > 0 ? totalRisk / losingTrades : 0;
-
-  const rrRatio = averageRisk > 0 ? averageReward / averageRisk : 0;
-  const avgPnl = totalTrades > 0 ? totalPnl / totalTrades : 0;
-
-  const bestTrade = trades.reduce((max, trade) => (trade.pnl > (max.pnl ?? -Infinity)) ? trade : max, trades[0]);
-  const worstTrade = trades.reduce((min, trade) => (trade.pnl < (min.pnl ?? Infinity)) ? trade : min, trades[0]);
-
+  const bestTradePnl = trades.length > 0 ? Math.max(...trades.map(t => t.pnl)) : 0;
+  const worstTradePnl = trades.length > 0 ? Math.min(...trades.map(t => t.pnl)) : 0;
 
   const performanceData = trades
     .slice() 
@@ -148,11 +105,6 @@ function calculateStats(trades: Trade[]) {
       return acc;
     }, [] as { date: string; pnl: number }[]);
 
-  const winLossData = [
-    { name: 'Wins', value: winningTrades, fill: "hsl(var(--chart-2))" },
-    { name: 'Losses', value: losingTrades, fill: "hsl(var(--destructive))" },
-    { name: 'Break Even', value: beTrades, fill: "hsl(var(--muted-foreground))" },
-  ];
   
   const weekdayPnl = [
     { name: 'Mon', pnl: 0 },
@@ -176,14 +128,11 @@ function calculateStats(trades: Trade[]) {
     winRate,
     winningTrades,
     losingTrades,
-    beTrades,
     totalTrades,
-    rrRatio,
-    avgPnl,
-    bestTrade,
-    worstTrade,
+    bestTradePnl,
+    worstTradePnl,
+    avgTradePnl,
     performanceData,
-    winLossData,
     weekdayPerformance: weekdayPnl
   };
 }
@@ -193,12 +142,7 @@ export default function DashboardPage() {
   const [user, loadingUser] = useAuthState(auth);
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   const [dateRange, setDateRange] = useState<DateRange>("all");
-  const [filters, setFilters] = useState({
-    asset: "all",
-    result: "all",
-    direction: "all",
-  });
-
+  
   const tradesQuery = useMemo(() => {
     if (user) {
       return query(collection(db, "trades"), where("userId", "==", user.uid));
@@ -218,6 +162,7 @@ export default function DashboardPage() {
             date: data.date?.toDate ? data.date.toDate() : new Date(data.date),
         } as Trade;
       });
+      // Sort by date descending (newest first) for the table
       tradesData.sort((a, b) => b.date.getTime() - a.date.getTime());
       setAllTrades(tradesData);
     } else {
@@ -228,84 +173,61 @@ export default function DashboardPage() {
   if (error) {
     console.error("Error fetching trades:", error);
   }
-  
-  const handleFilterChange = (filterType: FilterType, value: string) => {
-    setFilters(prev => ({ ...prev, [filterType]: value }));
-  };
 
-  const filteredTrades = useMemo(() => filterTrades(allTrades, dateRange, filters), [allTrades, dateRange, filters]);
+  const filteredTrades = useMemo(() => filterTrades(allTrades, dateRange), [allTrades, dateRange]);
   const stats = useMemo(() => calculateStats(filteredTrades), [filteredTrades]);
   
-  const uniqueAssets = useMemo(() => {
-    const assets = new Set(allTrades.map(t => t.asset));
-    return Array.from(assets);
-  }, [allTrades]);
-
-
   const isLoading = loadingUser || loadingTrades;
 
   return (
     <>
-      <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 md:gap-8 md:p-8" id="dashboard-content">
-        <div className="flex items-center justify-end gap-2 no-print">
-            <AddTradeModal />
-            <ExportButton trades={filteredTrades} stats={stats} user={user} />
+      <main className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <h1 className="text-2xl font-semibold text-foreground">Trade Journal</h1>
+            <div className="flex items-center gap-2">
+                <Select value={dateRange} onValueChange={(value) => setDateRange(value as DateRange)}>
+                    <SelectTrigger className="w-[180px] h-9">
+                        <SelectValue placeholder="Select Date Range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Time</SelectItem>
+                        <SelectItem value="this-year">This Year</SelectItem>
+                        <SelectItem value="this-month">This Month</SelectItem>
+                        <SelectItem value="this-week">This Week</SelectItem>
+                        <SelectItem value="today">Today</SelectItem>
+                    </SelectContent>
+                </Select>
+                <AddTradeModal />
+            </div>
         </div>
-        {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
-          </div>
-        ) : (
-            <StatsCards
-              totalPnl={stats.totalPnl}
-              winRate={stats.winRate}
-              winningTrades={stats.winningTrades}
-              totalTrades={stats.totalTrades}
-              rrRatio={stats.rrRatio}
-              dateRange={dateRange}
-              setDateRange={setDateRange}
-              avgPnl={stats.avgPnl}
-              bestTrade={stats.bestTrade}
-              worstTrade={stats.worstTrade}
-            />
-        )}
-
-        <div className="grid gap-4 md:gap-8 lg:grid-cols-1">
-          {isLoading ? (
-            <>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Skeleton className="lg:col-span-4 h-[325px]" />
-                <Skeleton className="lg:col-span-3 h-[325px]" />
-              </div>
-              <Skeleton className="h-[325px]" />
-              <Skeleton className="h-96" />
-            </>
-          ) : (
-            <>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 md:gap-8">
-                <div className="lg:col-span-4">
-                    <PerformanceChart data={stats.performanceData} />
-                </div>
-                <div className="lg:col-span-3">
-                    <WinLossChart data={stats.winLossData} />
-                </div>
-              </div>
-              <div className="grid gap-4 md:gap-8">
-                <WeekdayPerformanceChart data={stats.weekdayPerformance} />
-              </div>
-              <div>
-                <TradeFilters 
-                    uniqueAssets={uniqueAssets}
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                />
-                <TradeTable trades={filteredTrades} />
-              </div>
-            </>
-          )}
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {isLoading ? (
+                <>
+                   <Skeleton className="lg:col-span-2 h-[350px]" />
+                   <Skeleton className="lg:col-span-1 h-[350px]" />
+                   <Skeleton className="lg:col-span-3 h-[350px]" />
+                   <Skeleton className="lg:col-span-3 h-[400px]" />
+                </>
+            ) : (
+                <>
+                    {/* Main charts and stats */}
+                    <div className="lg:col-span-2">
+                        <PerformanceChart data={stats.performanceData} totalPnl={stats.totalPnl} />
+                    </div>
+                    <div className="lg:col-span-1">
+                        <StatsCards stats={stats} />
+                    </div>
+                    {/* Daily Performance */}
+                    <div className="lg:col-span-3">
+                         <WeekdayPerformanceChart data={stats.weekdayPerformance} />
+                    </div>
+                    {/* Trade Table */}
+                    <div className="lg:col-span-3">
+                        <TradeTable trades={filteredTrades} />
+                    </div>
+                </>
+            )}
         </div>
       </main>
     </>

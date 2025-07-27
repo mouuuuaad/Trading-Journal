@@ -38,7 +38,7 @@ import { Trade } from "@/lib/types";
 
 const popularAssets = [
   "EUR/USD", "GBP/USD", "USD/JPY", "USD/CAD", "AUD/USD",
-  "XAU/USD (Gold)", "USO/USD (Oil)", "BTC/USD", "ETH/USD", "SPX500"
+  "XAU/USD (Gold)", "USO/USD (Oil)", "BTC/USD", "ETH/USD", "SPX500", "NDX100", "TSLA", "AAPL", "AMZN"
 ];
 
 const tradeSchema = z.object({
@@ -114,13 +114,15 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
 
   const calculatePnl = (data: TradeFormValues) => {
     let pnl = 0;
-    const risk = Math.abs(data.entryPrice - data.stopLoss);
+    const pips = data.direction === 'Buy' 
+        ? data.takeProfit - data.entryPrice 
+        : data.entryPrice - data.takeProfit;
+    const riskPips = Math.abs(data.entryPrice - data.stopLoss);
     
     if (data.result === 'Win') {
-        const reward = Math.abs(data.takeProfit - data.entryPrice);
-        pnl = reward;
+        pnl = pips;
     } else if (data.result === 'Loss') {
-        pnl = -risk;
+        pnl = -riskPips;
     }
     return pnl;
   }
@@ -162,10 +164,10 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
   };
 
   const trigger = !isEditMode ? (
-     <Button size="sm" className="h-9 gap-1">
-          <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            Add Trade
+     <Button size="sm" className="h-9 gap-1.5">
+          <PlusCircle className="h-4 w-4" />
+          <span>
+            Import Trades
           </span>
         </Button>
   ) : null;
@@ -175,7 +177,7 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
         {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
-          <DialogTitle className="font-headline">{isEditMode ? "Edit Trade" : "Log New Trade"}</DialogTitle>
+          <DialogTitle className="font-semibold">{isEditMode ? "Edit Trade" : "Log New Trade"}</DialogTitle>
           <DialogDescription>
             {isEditMode ? "Update the details of your trade." : "Fill in the details of your trade. Click save when you're done."}
           </DialogDescription>
@@ -334,5 +336,3 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
     </Dialog>
   );
 }
-
-    

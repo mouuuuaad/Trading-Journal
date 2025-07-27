@@ -8,20 +8,7 @@ export const TradeVisionIcon = (props: React.SVGProps<SVGSVGElement>) => (
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
     >
-        <circle cx="12" cy="12" r="10" fill="hsl(var(--primary))" stroke="none" />
-        <path
-            d="M8 12H16"
-            stroke="hsl(var(--primary-foreground))"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="M12 8L12 16"
-            stroke="hsl(var(--primary-foreground))"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
+        <circle cx="12" cy="12" r="12" fill="hsl(var(--primary))"/>
+        <path d="M17.5 12C17.5 15.0376 15.0376 17.5 12 17.5C8.96243 17.5 6.5 15.0376 6.5 12C6.5 8.96243 8.96243 6.5 12 6.5" stroke="hsl(var(--background))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 );

@@ -13,7 +13,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -30,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Trade } from "@/lib/types";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { TradeDetailsModal } from "./trade-details-modal";
 import { AddTradeModal } from "./add-trade-modal";
 import {
@@ -62,7 +61,6 @@ export function TradeTable({ trades }: TradeTableProps) {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = React.useState(false);
 
   const { toast } = useToast();
-
 
   const handleViewDetails = (trade: Trade) => {
     setSelectedTradeDetails(trade);
@@ -110,18 +108,17 @@ export function TradeTable({ trades }: TradeTableProps) {
     <>
     <Card>
       <CardHeader className="px-4 pt-4 sm:px-6 sm:pt-6">
-        <CardTitle className="font-headline">Trade Log</CardTitle>
-        <CardDescription>A log of your trades. Use the filters above to refine your view.</CardDescription>
+        <CardTitle className="font-semibold text-foreground text-base">Positions</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Asset</TableHead>
+              <TableRow className="border-border/40">
+                <TableHead>Symbol</TableHead>
+                <TableHead>Time</TableHead>
                 <TableHead className="text-center">Result</TableHead>
-                <TableHead className="text-right hidden sm:table-cell">P/L</TableHead>
-                <TableHead className="text-right hidden md:table-cell">Date</TableHead>
+                <TableHead className="text-right">Realized P&L</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -130,9 +127,9 @@ export function TradeTable({ trades }: TradeTableProps) {
             <TableBody>
               {trades.length > 0 ? (
                   trades.map((trade) => (
-                    <TableRow key={trade.id}>
+                    <TableRow key={trade.id} className="border-border/40">
                       <TableCell>
-                        <div className="font-medium">{trade.asset}</div>
+                        <div className="font-medium text-foreground">{trade.asset}</div>
                         <div
                           className={cn(
                             "text-sm text-muted-foreground",
@@ -141,6 +138,10 @@ export function TradeTable({ trades }: TradeTableProps) {
                         >
                           {trade.direction}
                         </div>
+                      </TableCell>
+                       <TableCell>
+                        <div className="font-medium text-foreground">{format(trade.date, "dd MMMM yyyy")}</div>
+                        <div className="text-sm text-muted-foreground">{formatDistanceToNow(trade.date, { addSuffix: true })}</div>
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge
@@ -151,23 +152,19 @@ export function TradeTable({ trades }: TradeTableProps) {
                               ? "destructive"
                               : "secondary"
                           }
-                          className={cn(
-                            "w-[50px] justify-center",
-                            trade.result === 'Win' ? 'bg-primary text-primary-foreground hover:bg-primary/80' : ''
-                          )}
+                          className="w-[50px] justify-center"
                         >
                           {trade.result}
                         </Badge>
                       </TableCell>
                       <TableCell
                         className={cn(
-                          "hidden sm:table-cell text-right font-mono",
+                          "text-right font-medium",
                           trade.pnl >= 0 ? "text-primary" : "text-destructive"
                         )}
                       >
                         {trade.pnl >= 0 ? "+" : ""}${Math.abs(trade.pnl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </TableCell>
-                      <TableCell className="hidden md:table-cell text-right">{format(trade.date, "yyyy-MM-dd")}</TableCell>
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -189,7 +186,7 @@ export function TradeTable({ trades }: TradeTableProps) {
                   ))
               ) : (
                   <TableRow>
-                      <TableCell colSpan={5} className="text-center h-24">No trades match the current filters.</TableCell>
+                      <TableCell colSpan={5} className="text-center h-24">No trades logged yet.</TableCell>
                   </TableRow>
               )}
             </TableBody>
