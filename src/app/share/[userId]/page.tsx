@@ -2,8 +2,7 @@
 import { ShareClientPage } from './share-client-page';
 import { Trade } from "@/lib/types";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase-admin"; // Using admin SDK for server-side access
-import { getAuth } from "firebase-admin/auth";
+import { db, auth } from "@/lib/firebase-admin"; // Using admin SDK for server-side access
 
 type User = {
     displayName?: string;
@@ -23,7 +22,7 @@ async function getShareData(userId: string): Promise<ShareData> {
         // 1. Fetch User Data using the Admin SDK
         let userData: User = { displayName: "Anonymous User", photoURL: "" };
         try {
-            const userRecord = await getAuth().getUser(userId);
+            const userRecord = await auth.getUser(userId);
             userData = {
                 displayName: userRecord.displayName || "Anonymous User",
                 photoURL: userRecord.photoURL || ""
