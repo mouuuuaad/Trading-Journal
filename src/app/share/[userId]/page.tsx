@@ -202,7 +202,6 @@ const getInitials = (name: string | null | undefined) => {
 
 
 export default function SharePage({ params }: { params: { userId: string } }) {
-  const { userId } = params;
   const [allTrades, setAllTrades] = useState<Trade[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -216,10 +215,12 @@ export default function SharePage({ params }: { params: { userId: string } }) {
 
   useEffect(() => {
     const fetchData = async () => {
+        if (!params.userId) return;
+
         setIsLoading(true);
         setError(null);
         try {
-            const res = await fetch(`/api/share/${userId}`);
+            const res = await fetch(`/api/share/${params.userId}`);
             if (!res.ok) {
                 const errorData = await res.json();
                 throw new Error(errorData.error || `Failed to fetch data: ${res.statusText}`);
@@ -239,7 +240,7 @@ export default function SharePage({ params }: { params: { userId: string } }) {
     };
 
     fetchData();
-  }, [userId]);
+  }, [params]);
 
 
   const handleFilterChange = (filterType: FilterType, value: string) => {
