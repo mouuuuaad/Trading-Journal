@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server';
 import admin from 'firebase-admin';
 import { collection, query, where, getDocs } from "firebase/firestore";
 
-// This is a sensitive file and should not be exposed to the client.
+// This tells Next.js to run this route dynamically
+export const dynamic = 'force-dynamic';
+
 const serviceAccount = {
   "type": "service_account",
   "project_id": "compass-6b774",
@@ -18,7 +20,7 @@ const serviceAccount = {
   "universe_domain": "googleapis.com"
 };
 
-// Initialize Firebase Admin SDK
+// Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -61,7 +63,8 @@ export async function GET(request: Request, { params }: { params: { userId: stri
       return {
         id: doc.id,
         ...data,
-        date: data.date.toDate().toISOString(), // Serialize date to ISO string
+        // Ensure date is serializable
+        date: data.date?.toDate ? data.date.toDate().toISOString() : new Date().toISOString(),
       };
     });
 
@@ -69,6 +72,7 @@ export async function GET(request: Request, { params }: { params: { userId: stri
 
   } catch (error) {
     console.error(`Error fetching share data for ${userId}:`, error);
-    return NextResponse.json({ error: 'A server error occurred while fetching the share data.' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: `A server error occurred while fetching the share data: ${errorMessage}` }, { status: 500 });
   }
 }
