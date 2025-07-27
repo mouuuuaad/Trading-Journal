@@ -28,6 +28,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ExportButton } from "@/components/dashboard/export-button";
+import { Metadata } from "next";
+
+// export const metadata: Metadata = {
+//   title: "Dashboard - HsebliTrade",
+//   description: "Your personal trading dashboard. Analyze your performance at a glance.",
+// };
+
 
 type DateRange = "all" | "today" | "this-week" | "this-month" | "this-year";
 
@@ -175,7 +182,7 @@ export default function DashboardPage() {
     <>
       <main className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-foreground">Trade Journal</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
             <div className="flex items-center gap-2">
                 <Select value={dateRange} onValueChange={(value) => setDateRange(value as DateRange)}>
                     <SelectTrigger className="w-[180px] h-9">
@@ -199,7 +206,7 @@ export default function DashboardPage() {
                 <>
                    <Skeleton className="lg:col-span-2 h-[382px]" />
                    <Skeleton className="lg:col-span-1 h-[382px]" />
-                   <Skeleton className="lg:col-span-3 h-[302px]" />
+                   <Skeleton className="lg:col-span-3 h-[380px]" />
                    <Skeleton className="lg:col-span-3 h-[400px]" />
                 </>
             ) : (
@@ -211,7 +218,7 @@ export default function DashboardPage() {
                     <div className="lg:col-span-1">
                         <StatsCards stats={stats} />
                     </div>
-                    {/* Daily Performance */}
+                    {/* Market Overview */}
                     <div className="lg:col-span-3">
                          <GoldChart />
                     </div>
