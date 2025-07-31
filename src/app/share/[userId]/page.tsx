@@ -284,7 +284,7 @@ export default function SharePage() {
         </div>
       </main>
       <footer className="mt-auto flex items-center justify-center p-4">
-             <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+             <Link  href="https://t.me/MouuZ4" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
                 <HsebliTradeIcon className="h-5 w-5" />
                 <span>Created by Mouaad Idoufkir</span>
             </Link>

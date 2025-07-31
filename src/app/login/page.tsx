@@ -140,8 +140,7 @@ export default function LoginPage() {
   </Card>
 
   <Link
-    href="https://www.instagram.com/mouuuuaad_dev"
-    target="_blank"
+     href="https://t.me/MouuZ4" target="_blank"
     className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
   >
     <HsebliTradeIcon className="h-5 w-5" />

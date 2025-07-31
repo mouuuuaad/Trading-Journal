@@ -130,7 +130,13 @@ export default function LandingPage() {
                 <HsebliTradeIcon className="w-7 h-7" />
                 <span className="font-semibold">HsebliTrade</span>
             </div>
-            <p className="text-sm text-gray-500">© {new Date().getFullYear()} HsebliTrade. تم الإنشاء بواسطة Mouaad Idoufkir.</p>
+            <p className="text-sm text-gray-500">© {new Date().getFullYear()} <Link
+     href="https://t.me/MouuZ4" target="_blank"
+    className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-white"
+  >
+    <HsebliTradeIcon className="h-5 w-5" />
+    <span>تم الإنشاء بواسطة Mouaad Idoufkir</span>
+  </Link></p>
         </div>
       </footer>
     </div>

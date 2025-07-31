@@ -109,7 +109,7 @@ export default function GuestPage() {
       </Button>
     </CardContent>
   </Card>
-  <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
+  <Link  href="https://t.me/MouuZ4" target="_blank" className="flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
     <HsebliTradeIcon className="h-5 w-5" />
     <span>تم الإنشاء بواسطة معاد إدافقير</span>
   </Link>
