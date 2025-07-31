@@ -54,7 +54,7 @@ export function ExportButton({ trades, stats, user }: ExportButtonProps) {
         // Add Header
         doc.setFontSize(22);
         doc.setFont("helvetica", "bold");
-        doc.text("TradeVision Trading Report", 14, 22);
+        doc.text("HsebliTrade Trading Report", 14, 22);
         doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
         doc.text(`Generated for: ${user?.displayName || user?.email || 'N/A'}`, 14, 30);
