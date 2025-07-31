@@ -33,7 +33,7 @@ type ExportButtonProps = {
 
 export function ExportButton({ trades, stats, user }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
-  const [fileName, setFileName] = useState(`TradeVision_Report_${format(new Date(), 'yyyy-MM-dd')}`);
+  const [fileName, setFileName] = useState(`HsebliTrade_Report_${format(new Date(), 'yyyy-MM-dd')}`);
   const { toast } = useToast();
 
   const handleExport = async () => {
@@ -145,41 +145,42 @@ export function ExportButton({ trades, stats, user }: ExportButtonProps) {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-         <Button size="sm" variant="outline" className="h-9" disabled={isExporting}>
-             {isExporting ? <Loader2 className="h-4 w-4 animate-spin sm:mr-2" /> : <FileDown className="h-4 w-4 sm:mr-2" />}
-             <span className="hidden sm:inline">
-                 {isExporting ? "Exporting..." : "Export"}
-             </span>
-         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Export Report to PDF</AlertDialogTitle>
-          <AlertDialogDescription>
-            Enter a filename for your PDF report. A detailed summary and a table of your selected trades will be included.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="filename" className="text-right">
-              Filename
-            </Label>
-            <Input
-              id="filename"
-              value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
-              className="col-span-3"
-            />
-          </div>
-        </div>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleExport} disabled={isExporting}>
-            {isExporting ? "Generating..." : "Export PDF"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+  <AlertDialogTrigger asChild>
+     <Button size="sm" variant="outline" className="h-9" disabled={isExporting}>
+         {isExporting ? <Loader2 className="h-4 w-4 animate-spin sm:mr-2" /> : <FileDown className="h-4 w-4 sm:mr-2" />}
+         <span className="hidden sm:inline">
+             {isExporting ? "جاري التصدير..." : "تصدير"}
+         </span>
+     </Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>تصدير التقرير إلى ملف PDF</AlertDialogTitle>
+      <AlertDialogDescription>
+        الرجاء إدخال اسم الملف لتقرير PDF الخاص بك. سيتم تضمين ملخص مفصل وجدول للصفقات التي اخترتها.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="filename" className="text-right">
+          اسم الملف
+        </Label>
+        <Input
+          id="filename"
+          value={fileName}
+          onChange={(e) => setFileName(e.target.value)}
+          className="col-span-3"
+        />
+      </div>
+    </div>
+    <AlertDialogFooter>
+      <AlertDialogCancel>إلغاء</AlertDialogCancel>
+      <AlertDialogAction onClick={handleExport} disabled={isExporting}>
+        {isExporting ? "جارٍ الإنشاء..." : "تصدير PDF"}
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
   )
 }

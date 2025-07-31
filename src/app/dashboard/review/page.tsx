@@ -115,109 +115,116 @@ export default function ReviewPage() {
     return (
         <>
             <main className="flex-1 space-y-4 p-4 sm:p-6 md:p-8">
-                <div className="space-y-2">
-                    <h1 className="font-headline text-2xl font-bold tracking-tight md:text-3xl">Trade Review</h1>
-                    <p className="text-muted-foreground">Go through your trades one-by-one to analyze and learn from them.</p>
-                </div>
+  <div className="space-y-2">
+    <h1 className="font-headline text-2xl font-bold tracking-tight md:text-3xl">مراجعة التداول</h1>
+    <p className="text-muted-foreground">راجع تداولاتك وحدة بوحدة لتحليلها والتعلم منها.</p>
+  </div>
 
-                {isLoading ? (
-                    <Card className="max-w-4xl mx-auto">
-                        <CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader>
-                        <CardContent className="space-y-4">
-                            <Skeleton className="h-64 w-full" />
-                            <Skeleton className="h-24 w-full" />
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Skeleton className="h-10 w-24" />
-                            <Skeleton className="h-10 w-24" />
-                        </CardFooter>
-                    </Card>
-                ) : trades.length === 0 ? (
-                    <Card className="max-w-4xl mx-auto flex flex-col items-center justify-center h-96">
-                        <CardHeader className="text-center">
-                            <BookOpenCheck className="mx-auto h-16 w-16 text-muted-foreground" />
-                            <CardTitle className="mt-4">No Trades to Review</CardTitle>
-                            <CardDescription>
-                                Add some trades in your dashboard to start your review session.
-                            </CardDescription>
-                        </CardHeader>
-                    </Card>
-                ) : currentTrade && (
-                    <Card className="max-w-4xl mx-auto">
-                        <CardHeader>
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <CardTitle className="font-headline text-2xl">{currentTrade.asset}</CardTitle>
-                                    <CardDescription>{format(currentTrade.date, "eeee, MMMM d, yyyy 'at' p")}</CardDescription>
-                                </div>
-                                <div className="text-right">
-                                    <Badge variant={currentTrade.result === "Win" ? "default" : currentTrade.result === "Loss" ? "destructive" : "secondary"} className={cn("w-[60px] justify-center text-base", currentTrade.result === 'Win' ? 'bg-primary text-primary-foreground hover:bg-primary/80' : '')}>
-                                        {currentTrade.result}
-                                    </Badge>
-                                    <p className={cn("font-bold text-lg", currentTrade.pnl >= 0 ? "text-primary" : "text-destructive")}>
-                                        {currentTrade.pnl >= 0 ? "+" : ""}${currentTrade.pnl.toFixed(2)}
-                                    </p>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            {currentTrade.screenshotUrl && (
-                                <div className="space-y-2 pt-2">
-                                    <div className="p-2 border rounded-md bg-muted/20">
-                                        <img src={currentTrade.screenshotUrl} alt={`Screenshot for ${currentTrade.asset} trade`} className="w-full h-auto rounded-md object-contain max-h-[400px]" />
-                                    </div>
-                                </div>
-                            )}
+  {isLoading ? (
+    <Card className="max-w-4xl mx-auto">
+      <CardHeader><Skeleton className="h-8 w-1/2" /></CardHeader>
+      <CardContent className="space-y-4">
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Skeleton className="h-10 w-24" />
+        <Skeleton className="h-10 w-24" />
+      </CardFooter>
+    </Card>
+  ) : trades.length === 0 ? (
+    <Card className="max-w-4xl mx-auto flex flex-col items-center justify-center h-96">
+      <CardHeader className="text-center">
+        <BookOpenCheck className="mx-auto h-16 w-16 text-muted-foreground" />
+        <CardTitle className="mt-4">لا توجد تداولات للمراجعة</CardTitle>
+        <CardDescription>
+          أضف بعض التداولات في لوحة التحكم لتبدأ جلسة المراجعة.
+        </CardDescription>
+      </CardHeader>
+    </Card>
+  ) : currentTrade && (
+    <Card className="max-w-4xl mx-auto">
+      <CardHeader>
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="font-headline text-2xl">{currentTrade.asset}</CardTitle>
+            <CardDescription>{format(currentTrade.date, "eeee, MMMM d, yyyy 'في' p")}</CardDescription>
+          </div>
+          <div className="text-right">
+            <Badge
+              variant={currentTrade.result === "Win" ? "default" : currentTrade.result === "Loss" ? "destructive" : "secondary"}
+              className={cn("w-[60px] justify-center text-base", currentTrade.result === 'Win' ? 'bg-primary text-primary-foreground hover:bg-primary/80' : '')}
+            >
+              {currentTrade.result}
+            </Badge>
+            <p className={cn("font-bold text-lg", currentTrade.pnl >= 0 ? "text-primary" : "text-destructive")}>
+              {currentTrade.pnl >= 0 ? "+" : ""}${currentTrade.pnl.toFixed(2)}
+            </p>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {currentTrade.screenshotUrl && (
+          <div className="space-y-2 pt-2">
+            <div className="p-2 border rounded-md bg-muted/20">
+              <img
+                src={currentTrade.screenshotUrl}
+                alt={`صورة شاشة لتداول ${currentTrade.asset}`}
+                className="w-full h-auto rounded-md object-contain max-h-[400px]"
+              />
+            </div>
+          </div>
+        )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                                <DetailRow label="Direction" value={currentTrade.direction} valueClassName={currentTrade.direction === "Buy" ? "text-green-500" : "text-red-500"} />
-                                <DetailRow label="Entry Price" value={currentTrade.entryPrice.toFixed(4)} />
-                                <DetailRow label="Stop Loss" value={currentTrade.stopLoss.toFixed(4)} />
-                                <DetailRow label="Take Profit" value={currentTrade.takeProfit.toFixed(4)} />
-                            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+          <DetailRow label="الاتجاه" value={currentTrade.direction} valueClassName={currentTrade.direction === "Buy" ? "text-green-500" : "text-red-500"} />
+          <DetailRow label="سعر الدخول" value={currentTrade.entryPrice.toFixed(4)} />
+          <DetailRow label="وقف الخسارة" value={currentTrade.stopLoss.toFixed(4)} />
+          <DetailRow label="جني الأرباح" value={currentTrade.takeProfit.toFixed(4)} />
+        </div>
 
-                            {currentTrade.notes && (
-                                <div className="space-y-2 pt-2">
-                                    <h4 className="font-medium text-foreground">Original Notes</h4>
-                                    <div className="p-3 bg-muted/50 rounded-md text-sm text-muted-foreground whitespace-pre-wrap border">
-                                        {currentTrade.notes}
-                                    </div>
-                                </div>
-                            )}
+        {currentTrade.notes && (
+          <div className="space-y-2 pt-2">
+            <h4 className="font-medium text-foreground">ملاحظات أصلية</h4>
+            <div className="p-3 bg-muted/50 rounded-md text-sm text-muted-foreground whitespace-pre-wrap border">
+              {currentTrade.notes}
+            </div>
+          </div>
+        )}
 
-                            <div className="space-y-2 pt-2">
-                                <Label htmlFor="post-analysis" className="text-base font-medium text-foreground">Post-Trade Analysis</Label>
-                                <p className="text-sm text-muted-foreground">What did you do well? What could you improve? What did you learn?</p>
-                                <Textarea
-                                    id="post-analysis"
-                                    value={postAnalysis}
-                                    onChange={(e) => setPostAnalysis(e.target.value)}
-                                    placeholder="I followed my plan perfectly..."
-                                    rows={5}
-                                    className="text-base"
-                                />
-                                <div className="flex justify-end pt-2">
-                                    <Button onClick={handleSaveAnalysis} disabled={isSaving}>
-                                        {isSaving ? "Saving..." : "Save Analysis"}
-                                    </Button>
-                                </div>
-                            </div>
+        <div className="space-y-2 pt-2">
+          <Label htmlFor="post-analysis" className="text-base font-medium text-foreground">تحليل ما بعد التداول</Label>
+          <p className="text-sm text-muted-foreground">ما الذي قمت به بشكل جيد؟ ماذا يمكنك تحسينه؟ ماذا تعلمت؟</p>
+          <Textarea
+            id="post-analysis"
+            value={postAnalysis}
+            onChange={(e) => setPostAnalysis(e.target.value)}
+            placeholder="اتبعت خطتي تمامًا..."
+            rows={5}
+            className="text-base"
+          />
+          <div className="flex justify-end pt-2">
+            <Button onClick={handleSaveAnalysis} disabled={isSaving}>
+              {isSaving ? "جارٍ الحفظ..." : "حفظ التحليل"}
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between items-center border-t pt-6">
+        <Button variant="outline" onClick={handlePrev} disabled={currentIndex === 0}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> السابق
+        </Button>
+        <p className="text-sm text-muted-foreground">
+          التداول {currentIndex + 1} من {trades.length}
+        </p>
+        <Button variant="outline" onClick={handleNext} disabled={currentIndex === trades.length - 1}>
+          التالي <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </CardFooter>
+    </Card>
+  )}
+</main>
 
-                        </CardContent>
-                        <CardFooter className="flex justify-between items-center border-t pt-6">
-                            <Button variant="outline" onClick={handlePrev} disabled={currentIndex === 0}>
-                                <ArrowLeft className="mr-2 h-4 w-4" /> Previous
-                            </Button>
-                             <p className="text-sm text-muted-foreground">
-                                Trade {currentIndex + 1} of {trades.length}
-                            </p>
-                            <Button variant="outline" onClick={handleNext} disabled={currentIndex === trades.length - 1}>
-                                Next <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                )}
-            </main>
         </>
     );
 }

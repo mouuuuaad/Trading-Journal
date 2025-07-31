@@ -50,95 +50,97 @@ export function Header({ children }: HeaderProps) {
   ];
 
   return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 border-b border-border/40 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6 z-50 no-print">
-      <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+   <header className="sticky top-0 flex h-16 items-center gap-4 border-b border-border/40 bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6 z-50 no-print">
+  <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+    <Link
+      href="/dashboard"
+      className="flex items-center gap-2 text-lg font-semibold md:text-base"
+    >
+      <HsebliTradeIcon className="h-7 w-7" />
+      <span className="font-bold text-lg text-foreground">HsebliTrade</span>
+    </Link>
+    {navItems.map((item) => (
+        <Link key={item.href} href={item.href} 
+          className={cn(
+            "transition-colors hover:text-foreground",
+            pathname === item.href ? "text-foreground font-semibold" : "text-muted-foreground"
+          )}
+        >
+          {item.label}
+        </Link>
+    ))}
+  </nav>
+  <Sheet>
+    <SheetTrigger asChild>
+      <Button
+        variant="outline"
+        size="icon"
+        className="shrink-0 md:hidden"
+      >
+        <Menu className="h-5 w-5" />
+        <span className="sr-only">تبديل قائمة التنقل</span>
+      </Button>
+    </SheetTrigger>
+    <SheetContent side="left">
+      <SheetHeader>
+        <SheetTitle className="sr-only">قائمة التنقل</SheetTitle>
+      </SheetHeader>
+      <nav className="grid gap-6 text-lg font-medium">
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 text-lg font-semibold md:text-base"
+          className="flex items-center gap-2 text-lg font-semibold"
         >
-          <HsebliTradeIcon className="h-7 w-7" />
-          <span className="font-bold text-lg text-foreground">HsebliTrade</span>
+          <HsebliTradeIcon className="h-6 w-6" />
+          <span>HsebliTrade</span>
         </Link>
-        {navItems.map((item) => (
+         {navItems.map((item) => (
             <Link key={item.href} href={item.href} 
-              className={cn(
+            className={cn(
                 "transition-colors hover:text-foreground",
-                pathname === item.href ? "text-foreground font-semibold" : "text-muted-foreground"
-              )}
+                pathname === item.href ? "text-foreground" : "text-muted-foreground"
+            )}
             >
-              {item.label}
+            {item.label}
             </Link>
         ))}
+         <Link href={"/dashboard/settings"} 
+          className={cn(
+            "transition-colors hover:text-foreground",
+            pathname === "/dashboard/settings" ? "text-foreground" : "text-muted-foreground"
+          )}
+        >
+         Settings
+        </Link>
       </nav>
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="shrink-0 md:hidden"
-          >
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle navigation menu</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left">
-          <SheetHeader>
-            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-          </SheetHeader>
-          <nav className="grid gap-6 text-lg font-medium">
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 text-lg font-semibold"
-            >
-              <HsebliTradeIcon className="h-6 w-6" />
-              <span>HsebliTrade</span>
-            </Link>
-             {navItems.map((item) => (
-                <Link key={item.href} href={item.href} 
-                className={cn(
-                    "transition-colors hover:text-foreground",
-                    pathname === item.href ? "text-foreground" : "text-muted-foreground"
-                )}
-                >
-                {item.label}
-                </Link>
-            ))}
-             <Link href={"/dashboard/settings"} 
-              className={cn(
-                "transition-colors hover:text-foreground",
-                pathname === "/dashboard/settings" ? "text-foreground" : "text-muted-foreground"
-              )}
-            >
-              Settings
-            </Link>
-          </nav>
-        </SheetContent>
-      </Sheet>
-      <div className="flex w-full items-center gap-2 md:ml-auto md:gap-4">
-        <div className="ml-auto flex-1 sm:flex-initial" />
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="rounded-full h-9 w-9">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.photoURL || undefined} alt={user?.displayName || 'User'} />
-                <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
-              </Avatar>
-              <span className="sr-only">Toggle user menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{user?.displayName || user?.email}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>Settings</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push('/dashboard/support')}>Support</DropdownMenuItem>
-            <DropdownMenuSeparator />
-             <DropdownMenuItem onClick={handleLogout}>
-                Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
+    </SheetContent>
+  </Sheet>
+  <div className="flex w-full items-center gap-2 md:ml-auto md:gap-4">
+    <div className="ml-auto flex-1 sm:flex-initial" />
+    
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="secondary" size="icon" className="rounded-full h-9 w-9">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user?.photoURL || undefined} alt={user?.displayName || 'المستخدم'} />
+            <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
+          </Avatar>
+          <span className="sr-only">تبديل قائمة المستخدم</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>{user?.displayName || user?.email}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push('/dashboard/settings')}>الإعدادات</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push('/dashboard/support')}>الدعم</DropdownMenuItem>
+        <DropdownMenuSeparator />
+         <DropdownMenuItem onClick={handleLogout}>
+            تسجيل الخروج
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+</header>
+
+
   );
 }

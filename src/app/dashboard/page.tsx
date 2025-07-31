@@ -180,56 +180,59 @@ export default function DashboardPage() {
 
   return (
     <>
-      <main className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
-            <div className="flex items-center gap-2">
-                <Select value={dateRange} onValueChange={(value) => setDateRange(value as DateRange)}>
-                    <SelectTrigger className="w-[180px] h-9">
-                        <SelectValue placeholder="Select Date Range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Time</SelectItem>
-                        <SelectItem value="this-year">This Year</SelectItem>
-                        <SelectItem value="this-month">This Month</SelectItem>
-                        <SelectItem value="this-week">This Week</SelectItem>
-                        <SelectItem value="today">Today</SelectItem>
-                    </SelectContent>
-                </Select>
-                <ExportButton trades={filteredTrades} stats={stats} user={user} />
-                <AddTradeModal />
-            </div>
+     <main className="flex-1 space-y-6 p-4 sm:p-6 md:p-8">
+  <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <h1 className="text-2xl font-semibold text-foreground">لوحة التحكم</h1>
+    <div className="flex items-center gap-2">
+      <Select value={dateRange} onValueChange={(value) => setDateRange(value as DateRange)}>
+        <SelectTrigger className="w-[180px] h-9">
+          <SelectValue placeholder="اختر نطاق التاريخ" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">كل الوقت</SelectItem>
+          <SelectItem value="this-year">هذه السنة</SelectItem>
+          <SelectItem value="this-month">هذا الشهر</SelectItem>
+          <SelectItem value="this-week">هذا الأسبوع</SelectItem>
+          <SelectItem value="today">اليوم</SelectItem>
+        </SelectContent>
+      </Select>
+      <ExportButton trades={filteredTrades} stats={stats} user={user} />
+      <AddTradeModal />
+    </div>
+  </div>
+
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    {isLoading ? (
+      <>
+        <Skeleton className="lg:col-span-2 h-[382px]" />
+        <Skeleton className="lg:col-span-1 h-[382px]" />
+        <Skeleton className="lg:col-span-3 h-[380px]" />
+        <Skeleton className="lg:col-span-3 h-[400px]" />
+      </>
+    ) : (
+      <>
+        {/* الرسوم البيانية والإحصائيات الرئيسية */}
+        <div className="lg:col-span-2 mb-2">
+          <PerformanceChart data={stats.performanceData} totalPnl={stats.totalPnl} />
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-                <>
-                   <Skeleton className="lg:col-span-2 h-[382px]" />
-                   <Skeleton className="lg:col-span-1 h-[382px]" />
-                   <Skeleton className="lg:col-span-3 h-[380px]" />
-                   <Skeleton className="lg:col-span-3 h-[400px]" />
-                </>
-            ) : (
-                <>
-                    {/* Main charts and stats */}
-                    <div className="lg:col-span-2">
-                        <PerformanceChart data={stats.performanceData} totalPnl={stats.totalPnl} />
-                    </div>
-                    <div className="lg:col-span-1">
-                        <StatsCards stats={stats} />
-                    </div>
-                    {/* Market Overview */}
-                    <div className="lg:col-span-3">
-                         <GoldChart />
-                    </div>
-                    {/* Trade Table */}
-                    <div className="lg:col-span-3">
-                        <TradeTable trades={filteredTrades} />
-                    </div>
-                </>
-            )}
+        <div className="lg:col-span-1">
+          <StatsCards stats={stats} />
         </div>
-      </main>
+
+        {/* نظرة عامة على السوق */}
+        <div className="lg:col-span-3">
+          <GoldChart />
+        </div>
+
+        {/* جدول الصفقات */}
+        <div className="lg:col-span-3">
+          <TradeTable trades={filteredTrades} />
+        </div>
+      </>
+    )}
+  </div>
+</main>
+
     </>
   );
 }

@@ -39,39 +39,40 @@ export function StatsCards({ stats }: StatsCardsProps) {
   const lossRate = totalTrades > 0 ? (losingTrades / totalTrades) * 100 : 0;
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold">Statistics</CardTitle>
-          <Info className="h-4 w-4 text-muted-foreground" />
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-            <div className="flex items-center justify-between mb-2">
-                <div className="text-sm font-semibold text-primary">W {winRate.toFixed(0)}%</div>
-                <div className="text-sm font-semibold text-destructive">L {lossRate.toFixed(0)}%</div>
-            </div>
-            <Progress value={winRate} className="h-1.5" />
-        </div>
-        
-        <div className="space-y-2 text-sm">
-            <StatRow label="Number of Winners" value={winningTrades} />
-            <StatRow label="Number of Losers" value={losingTrades} />
-            <StatRow label="Largest Win" value={`$${bestTradePnl.toFixed(2)}`} />
-            <StatRow label="Largest Loss" value={`$(${Math.abs(worstTradePnl).toFixed(2)})`} />
-            <StatRow label="Average Gain/Loss" value={`$${avgTradePnl.toFixed(2)}`} />
-        </div>
+   <Card className="h-full">
+  <CardHeader>
+    <div className="flex items-center justify-between">
+      <CardTitle className="text-base font-semibold">الإحصائيات</CardTitle>
+      <Info className="h-4 w-4 text-muted-foreground" />
+    </div>
+  </CardHeader>
+  
+  <CardContent className="space-y-4">
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-sm font-semibold text-primary">رابحة {winRate.toFixed(0)}%</div>
+        <div className="text-sm font-semibold text-destructive">خاسرة {lossRate.toFixed(0)}%</div>
+      </div>
+      <Progress value={winRate} className="h-1.5" />
+    </div>
+    
+    <div className="space-y-2 text-sm">
+      <StatRow label="عدد الصفقات الرابحة" value={winningTrades} />
+      <StatRow label="عدد الصفقات الخاسرة" value={losingTrades} />
+      <StatRow label="أكبر ربح" value={`$${bestTradePnl.toFixed(2)}`} />
+      <StatRow label="أكبر خسارة" value={`$(${Math.abs(worstTradePnl).toFixed(2)})`} />
+      <StatRow label="متوسط الربح/الخسارة" value={`$${avgTradePnl.toFixed(2)}`} />
+    </div>
 
-        <Separator />
+    <Separator />
 
-        <div className="space-y-2 text-sm">
-            <StatRow label="Realized P&L" value={`$${totalPnl.toFixed(2)}`} />
-            <StatRow label="Unrealized P&L" value={"$0.00"} />
-            <StatRow label="Total P&L" value={`$${totalPnl.toFixed(2)}`} />
-        </div>
+    <div className="space-y-2 text-sm">
+      <StatRow label="الأرباح والخسائر المحققة" value={`$${totalPnl.toFixed(2)}`} />
+      <StatRow label="الأرباح والخسائر غير المحققة" value={"$0.00"} />
+      <StatRow label="إجمالي الأرباح والخسائر" value={`$${totalPnl.toFixed(2)}`} />
+    </div>
+  </CardContent>
+</Card>
 
-      </CardContent>
-    </Card>
   );
 }

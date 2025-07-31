@@ -70,53 +70,84 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-muted/40 p-4">
-      <Card className="mx-auto w-full max-w-sm">
-        <CardHeader className="text-center space-y-2">
-          <HsebliTradeIcon className="mx-auto h-12 w-auto" />
-          <CardTitle className="font-headline text-3xl">HsebliTrade</CardTitle>
-          <CardDescription>Enter your credentials to access your trading journal</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" {...register("email")} disabled={isSubmitting || isGoogleLoading} />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
-            </div>
-            <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...register("password")} disabled={isSubmitting || isGoogleLoading}/>
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-            </div>
-            <Button type="submit" className="w-full" disabled={isSubmitting || isGoogleLoading}>
-              {isSubmitting ? "Logging in..." : "Login"}
-            </Button>
-          </form>
-            <div className="relative mt-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            <Button variant="outline" className="w-full mt-4" onClick={handleGoogleSignIn} disabled={isSubmitting || isGoogleLoading}>
-              {isGoogleLoading ? "Signing in..." : "Sign in with Google"}
-            </Button>
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="underline">
-              Sign up
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-      <Link href="https://www.instagram.com/mouuuuaad_dev" target="_blank" className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
-          <HsebliTradeIcon className="h-5 w-5" />
-          <span>Created by Mouaad Idoufkir</span>
-      </Link>
-    </div>
+  <Card className="mx-auto w-full max-w-sm">
+    <CardHeader className="text-center space-y-2">
+      <HsebliTradeIcon className="mx-auto h-12 w-auto" />
+      <CardTitle className="font-headline text-3xl">HsebliTrade</CardTitle>
+      <CardDescription>أدخل بيانات الدخول للوصول إلى دفتر تداولاتك</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="email">البريد الإلكتروني</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="example@domain.com"
+            {...register("email")}
+            disabled={isSubmitting || isGoogleLoading}
+          />
+          {errors.email && (
+            <p className="text-xs text-destructive">{errors.email.message}</p>
+          )}
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="password">كلمة المرور</Label>
+          <Input
+            id="password"
+            type="password"
+            {...register("password")}
+            disabled={isSubmitting || isGoogleLoading}
+          />
+          {errors.password && (
+            <p className="text-xs text-destructive">{errors.password.message}</p>
+          )}
+        </div>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting || isGoogleLoading}
+        >
+          {isSubmitting ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+        </Button>
+      </form>
+
+      <div className="relative mt-4">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-2 text-muted-foreground">أو تابع باستخدام</span>
+        </div>
+      </div>
+
+      <Button
+        variant="outline"
+        className="w-full mt-4"
+        onClick={handleGoogleSignIn}
+        disabled={isSubmitting || isGoogleLoading}
+      >
+        {isGoogleLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول باستخدام Google"}
+      </Button>
+
+      <div className="mt-4 text-center text-sm">
+        لا تملك حساباً؟{' '}
+        <Link href="/signup" className="underline">
+          أنشئ حساباً
+        </Link>
+      </div>
+    </CardContent>
+  </Card>
+
+  <Link
+    href="https://www.instagram.com/mouuuuaad_dev"
+    target="_blank"
+    className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+  >
+    <HsebliTradeIcon className="h-5 w-5" />
+    <span>تم الإنشاء بواسطة Mouaad Idoufkir</span>
+  </Link>
+</div>
+
   );
 }

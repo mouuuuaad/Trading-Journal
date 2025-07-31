@@ -152,196 +152,205 @@ export function AddTradeModal({ tradeToEdit, isOpen, onOpenChange }: AddTradeMod
     }
   };
 
-  const trigger = !isEditMode ? (
-     <Button size="sm" className="h-9 gap-1.5">
-          <PlusCircle className="h-4 w-4" />
-          <span>
-            Add Trade
-          </span>
-        </Button>
-  ) : null;
+const trigger = !isEditMode ? (
+  <Button size="sm" className="h-9 gap-1.5">
+    <PlusCircle className="h-4 w-4" />
+    <span>إضافة صفقة</span>
+  </Button>
+) : null;
 
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-        {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="sm:max-w-[625px]">
-        <DialogHeader>
-          <DialogTitle className="font-semibold">{isEditMode ? "Edit Trade" : "Log New Trade"}</DialogTitle>
-          <DialogDescription>
-            {isEditMode ? "Update the details of your trade." : "Fill in the details of your trade. Click save when you're done."}
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-4">
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="asset" className="text-right">Asset</Label>
-               <Controller
-                name="asset"
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select an asset" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {popularAssets.map(asset => (
-                        <SelectItem key={asset} value={asset}>{asset}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-               {errors.asset && <p className="col-span-4 text-right text-sm text-destructive">{errors.asset.message}</p>}
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="date" className="text-right">Date</Label>
-              <Controller
-                name="date"
-                control={control}
-                render={({ field }) => (
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn("col-span-3 justify-start text-left font-normal", !field.value && "text-muted-foreground")}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                )}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="direction" className="text-right">Direction</Label>
-               <Controller
-                name="direction"
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select direction" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Buy">Buy</SelectItem>
-                      <SelectItem value="Sell">Sell</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="lotSize" className="text-right">Lot Size</Label>
-              <Controller
-                name="lotSize"
-                control={control}
-                render={({ field }) => <Input id="lotSize" type="number" step="any" placeholder="0.01" className="col-span-3" {...field} value={field.value ?? ""} />}
-              />
-              {errors.lotSize && <p className="col-span-4 text-right text-sm text-destructive">{errors.lotSize.message}</p>}
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="entryPrice" className="text-right">Entry Price</Label>
-              <Controller
-                name="entryPrice"
-                control={control}
-                render={({ field }) => <Input id="entryPrice" type="number" step="any" placeholder="1.2500" className="col-span-3" {...field} value={field.value ?? ""} />}
-              />
-              {errors.entryPrice && <p className="col-span-4 text-right text-sm text-destructive">{errors.entryPrice.message}</p>}
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="stopLoss" className="text-right">Stop Loss</Label>
-              <Controller
-                name="stopLoss"
-                control={control}
-                render={({ field }) => <Input id="stopLoss" type="number" step="any" placeholder="1.2450" className="col-span-3" {...field} value={field.value ?? ""} />}
-              />
-              {errors.stopLoss && <p className="col-span-4 text-right text-sm text-destructive">{errors.stopLoss.message}</p>}
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="takeProfit" className="text-right">Take Profit</Label>
-              <Controller
-                name="takeProfit"
-                control={control}
-                render={({ field }) => <Input id="takeProfit" type="number" step="any" placeholder="1.2600" className="col-span-3" {...field} value={field.value ?? ""} />}
-              />
-               {errors.takeProfit && <p className="col-span-4 text-right text-sm text-destructive">{errors.takeProfit.message}</p>}
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="result" className="text-right">Result</Label>
-               <Controller
-                name="result"
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select result" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Win">Win</SelectItem>
-                      <SelectItem value="Loss">Loss</SelectItem>
-                      <SelectItem value="BE">Break Even (BE)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="pnl" className="text-right">P/L ($)</Label>
-              <Controller
-                name="pnl"
-                control={control}
-                render={({ field }) => <Input id="pnl" type="number" step="any" placeholder="250.50" className="col-span-3" {...field} value={field.value ?? ""} />}
-              />
-              {errors.pnl && <p className="col-span-4 text-right text-sm text-destructive">{errors.pnl.message}</p>}
-            </div>
-            <div className="grid grid-cols-4 items-start gap-4">
-                <Label htmlFor="screenshotUrl" className="text-right pt-2">Screenshot URL</Label>
-                <Controller
-                    name="screenshotUrl"
-                    control={control}
-                    render={({ field }) => (
-                    <Input
-                        id="screenshotUrl"
-                        placeholder="https://example.com/image.png"
-                        className="col-span-3"
-                        {...field}
-                         value={field.value ?? ""}
-                    />
-                    )}
-                />
-                {errors.screenshotUrl && <p className="col-span-4 text-right text-sm text-destructive">{errors.screenshotUrl.message}</p>}
-            </div>
-             <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="notes" className="text-right pt-2">Notes</Label>
-              <Controller
-                name="notes"
-                control={control}
-                render={({ field }) => (
-                  <Textarea
-                    id="notes"
-                    placeholder="Enter your thoughts on the trade, strategy, emotions, etc."
-                    className="col-span-3"
-                    {...field}
-                    value={field.value ?? ""}
-                  />
-                )}
-              />
-            </div>
+return (
+  <Dialog open={open} onOpenChange={setOpen}>
+    {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+    <DialogContent className="sm:max-w-[625px]">
+      <DialogHeader>
+        <DialogTitle className="font-semibold">{isEditMode ? "تعديل الصفقة" : "تسجيل صفقة جديدة"}</DialogTitle>
+        <DialogDescription>
+          {isEditMode ? "حدّث تفاصيل الصفقة الخاصة بك." : "املأ تفاصيل صفقتك. اضغط حفظ عند الانتهاء."}
+        </DialogDescription>
+      </DialogHeader>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid gap-5 grid-cols-2 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="asset" className="text-right">الأصل</Label>
+            <Controller
+              name="asset"
+              control={control}
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="اختر الأصل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {popularAssets.map(asset => (
+                      <SelectItem key={asset} value={asset}>{asset}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.asset && <p className="col-span-4 text-right text-sm text-destructive">{errors.asset.message}</p>}
           </div>
-          <DialogFooter>
-             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="date" className="text-right">التاريخ</Label>
+            <Controller
+              name="date"
+              control={control}
+              render={({ field }) => (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn("col-span-3 justify-start text-left font-normal", !field.value && "text-muted-foreground")}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value ? format(field.value, "PPP") : <span>اختر تاريخاً</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="direction" className="text-right">الاتجاه</Label>
+            <Controller
+              name="direction"
+              control={control}
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="اختر الاتجاه" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Buy">شراء</SelectItem>
+                    <SelectItem value="Sell">بيع</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="lotSize" className="text-right">حجم اللوت</Label>
+            <Controller
+              name="lotSize"
+              control={control}
+              render={({ field }) => <Input id="lotSize" type="number" step="any" placeholder="0.01" className="col-span-3" {...field} value={field.value ?? ""} />}
+            />
+            {errors.lotSize && <p className="col-span-4 text-right text-sm text-destructive">{errors.lotSize.message}</p>}
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="entryPrice" className="text-right">سعر الدخول</Label>
+            <Controller
+              name="entryPrice"
+              control={control}
+              render={({ field }) => <Input id="entryPrice" type="number" step="any" placeholder="1.2500" className="col-span-3" {...field} value={field.value ?? ""} />}
+            />
+            {errors.entryPrice && <p className="col-span-4 text-right text-sm text-destructive">{errors.entryPrice.message}</p>}
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="stopLoss" className="text-right">وقف الخسارة</Label>
+            <Controller
+              name="stopLoss"
+              control={control}
+              render={({ field }) => <Input id="stopLoss" type="number" step="any" placeholder="1.2450" className="col-span-3" {...field} value={field.value ?? ""} />}
+            />
+            {errors.stopLoss && <p className="col-span-4 text-right text-sm text-destructive">{errors.stopLoss.message}</p>}
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="takeProfit" className="text-right">جني الأرباح</Label>
+            <Controller
+              name="takeProfit"
+              control={control}
+              render={({ field }) => <Input id="takeProfit" type="number" step="any" placeholder="1.2600" className="col-span-3" {...field} value={field.value ?? ""} />}
+            />
+            {errors.takeProfit && <p className="col-span-4 text-right text-sm text-destructive">{errors.takeProfit.message}</p>}
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="result" className="text-right">النتيجة</Label>
+            <Controller
+              name="result"
+              control={control}
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="اختر النتيجة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Win">ربح</SelectItem>
+                    <SelectItem value="Loss">خسارة</SelectItem>
+                    <SelectItem value="BE">التعادل (BE)</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="pnl" className="text-right">الربح/الخسارة ($)</Label>
+            <Controller
+              name="pnl"
+              control={control}
+              render={({ field }) => <Input id="pnl" type="number" step="any" placeholder="250.50" className="col-span-3" {...field} value={field.value ?? ""} />}
+            />
+            {errors.pnl && <p className="col-span-4 text-right text-sm text-destructive">{errors.pnl.message}</p>}
+          </div>
+
+          <div className="grid grid-cols-4 items-start gap-4">
+            <Label htmlFor="screenshotUrl" className="text-right pt-2">رابط صورة الشاشة</Label>
+            <Controller
+              name="screenshotUrl"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  id="screenshotUrl"
+                  placeholder="https://example.com/image.png"
+                  className="col-span-3"
+                  {...field}
+                  value={field.value ?? ""}
+                />
+              )}
+            />
+            {errors.screenshotUrl && <p className="col-span-4 text-right text-sm text-destructive">{errors.screenshotUrl.message}</p>}
+          </div>
+
+          <div className="grid grid-cols-4 items-start gap-4">
+            <Label htmlFor="notes" className="text-right pt-2">ملاحظات</Label>
+            <Controller
+              name="notes"
+              control={control}
+              render={({ field }) => (
+                <Textarea
+                  id="notes"
+                  placeholder="اكتب أفكارك عن الصفقة، الاستراتيجية، المشاعر، إلخ."
+                  className="col-span-3"
+                  {...field}
+                  value={field.value ?? ""}
+                />
+              )}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>إلغاء</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "جارٍ الحفظ..." : "حفظ التغييرات"}
+          </Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  </Dialog>
+);
+
 }
 
     

@@ -65,43 +65,44 @@ const TradeTrackerIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function LandingPage() {
   return (
-    <div className="w-full bg-[#050505] text-white overflow-x-hidden">
+        <div className="w-full bg-[#050505] text-white overflow-x-hidden">
+      {/* رأس الصفحة */}
       <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
             <HsebliTradeIcon className="w-8 h-8" />
             <span className="text-xl font-bold">HsebliTrade</span>
         </div>
         <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Login</Link>
-            <Link href="/signup" className="text-sm font-medium bg-white text-black px-4 py-2 rounded-md hover:bg-gray-200 transition-colors">Sign Up</Link>
+            <Link href="/login" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">تسجيل الدخول</Link>
+            <Link href="/signup" className="text-sm font-medium bg-white text-black px-4 py-2 rounded-md hover:bg-gray-200 transition-colors">إنشاء حساب</Link>
         </div>
       </header>
 
       <main>
-        {/* Hero Section */}
+        {/* قسم البطل (Hero Section) */}
         <section className="relative pt-20 pb-10 sm:pt-32 sm:pb-20">
           <div className="absolute inset-0 bottom-1/3 bg-grid-pattern opacity-5"></div>
           <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-green-500/10 to-transparent"></div>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-                <span>Trusted by 20,000+ traders</span>
+                <span>موثوق به من طرف أكثر من 200 متداول</span>
                 <span className="text-gray-600">|</span>
-                <span className="flex items-center gap-1"><Star className="w-4 h-4 text-yellow-400 fill-yellow-400"/> 4.8 rating</span>
+                <span className="flex items-center gap-1"><Star className="w-4 h-4 text-yellow-400 fill-yellow-400"/> تقييم 4.8</span>
             </div>
             <h1 className="mt-6 text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight max-w-4xl mx-auto">
-              All you need to stay ahead in the market.
+              كل ما تحتاجه لتتفوق في السوق.
             </h1>
             <div className="mt-8">
               <Link href="/signup">
                 <button className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-bold text-black bg-green-400 rounded-lg transition-transform transform hover:scale-105">
                   <span className="absolute inset-0 bg-green-300 rounded-lg blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></span>
-                  <span className="relative">Get started for free</span>
+                  <span className="relative">ابدأ مجاناً</span>
                   <ArrowRight className="relative w-5 h-5"/>
                 </button>
               </Link>
             </div>
              <div className="mt-8 flex items-center justify-center gap-4 text-sm text-gray-400">
-                <span>Also available on:</span>
+                <span>متوفر أيضاً على:</span>
                 <AppleIcon className="w-5 h-5"/>
                 <WindowsIcon className="w-5 h-5"/>
             </div>
@@ -109,55 +110,27 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-16">
             <div className="relative">
                 <Image
-                    src="https://placehold.co/1200x600.png"
-                    alt="HsebliTrade Dashboard"
+                    src="https://i.ibb.co/Z6SFDMV9/Capture-d-cran-31-7-2025-14637-localhost.jpg"
+                    alt="لوحة تحكم HsebliTrade"
                     width={1200}
                     height={600}
                     className="rounded-xl shadow-2xl shadow-green-500/10"
                     data-ai-hint="trading dashboard finance"
                 />
-                 <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent"></div>
             </div>
           </div>
         </section>
-
-        {/* Feature Sections */}
-        <div className="py-20 space-y-28">
-            <FeatureSection
-                icon={VisualizerIcon}
-                title="Visualizer"
-                headline="All-in-one Superchart"
-                description="Real-time stock and options data straight from the exchange - with news, watchlists, and our proprietary options chart that outperforms the competition, all in one view."
-                imageUrl="https://placehold.co/600x400.png"
-                imageHint="financial chart graph"
-            />
-             <FeatureSection
-                icon={TrendsAIIcon}
-                title="TrendsAI"
-                headline="Smarter entries, clearer exits"
-                description="Built on thousands of backtests to help you catch trends, spot breakouts, and avoid sitting through the chop."
-                imageUrl="https://placehold.co/600x400.png"
-                imageHint="ai analytics data"
-                reverse
-            />
-             <FeatureSection
-                icon={TradeTrackerIcon}
-                title="Trade Tracker"
-                headline="Stay on top of every trade"
-                description="Your full trading history, automatically organized. Real-time stock and options data, intelligent strategy grouping, and cross-broker support."
-                imageUrl="https://placehold.co/600x400.png"
-                imageHint="trade history log"
-            />
-        </div>
       </main>
 
+      {/* تذييل الصفحة */}
       <footer className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8 border-t border-gray-800 pt-8">
             <div className="flex items-center gap-2">
                 <HsebliTradeIcon className="w-7 h-7" />
                 <span className="font-semibold">HsebliTrade</span>
             </div>
-            <p className="text-sm text-gray-500">© {new Date().getFullYear()} HsebliTrade. Created by Mouaad Idoufkir.</p>
+            <p className="text-sm text-gray-500">© {new Date().getFullYear()} HsebliTrade. تم الإنشاء بواسطة Mouaad Idoufkir.</p>
         </div>
       </footer>
     </div>
@@ -177,7 +150,7 @@ interface FeatureSectionProps {
 
 function FeatureSection({ icon: Icon, title, headline, description, imageUrl, imageHint, reverse = false }: FeatureSectionProps) {
     return (
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8">
+         <section className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className={`flex flex-col lg:flex-row items-center gap-12 lg:gap-20 ${reverse ? 'lg:flex-row-reverse' : ''}`}>
                 <div className="lg:w-1/2 text-center lg:text-left">
                     <div className="inline-flex items-center gap-3 bg-green-900/50 border border-green-500/30 text-green-300 rounded-lg px-4 py-2">

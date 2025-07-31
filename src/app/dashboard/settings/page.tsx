@@ -46,7 +46,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Copy, Loader2, Share2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -193,180 +192,181 @@ export default function SettingsPage() {
 
 
   return (
-    <main className="flex-1 space-y-4 p-4 sm:p-6 md:p-8">
-      <div className="space-y-2">
-        <h1 className="font-headline text-2xl font-bold tracking-tight md:text-3xl">Settings</h1>
-        <p className="text-muted-foreground">Manage your account, appearance, and data.</p>
-      </div>
-      <Tabs defaultValue="appearance" className="w-full">
-        <TabsList className="grid w-full max-w-lg grid-cols-4">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-          <TabsTrigger value="sharing">Sharing</TabsTrigger>
-          <TabsTrigger value="data">Data</TabsTrigger>
-        </TabsList>
-        <TabsContent value="profile">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profile</CardTitle>
-              <CardDescription>
-                This is how others will see you on the site.
-              </CardDescription>
-            </CardHeader>
-            <form onSubmit={handleSubmit(onProfileSubmit)}>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" {...register("name")} disabled={isSubmitting}/>
-                  {errors.name && (
-                    <p className="text-sm text-destructive">{errors.name.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" value={user?.email || ""} disabled />
-                </div>
-              </CardContent>
-              <CardFooter className="border-t px-6 py-4">
-                <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Saving..." : "Save Changes"}
-                </Button>
-              </CardFooter>
-            </form>
-          </Card>
-        </TabsContent>
-        <TabsContent value="appearance">
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>
-                Customize the look and feel of the app.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup
-                defaultValue={theme}
-                onValueChange={setTheme}
-                className="grid max-w-md grid-cols-1 gap-8 pt-2 sm:grid-cols-3"
-              >
-                <div>
-                  <RadioGroupItem value="light" id="light" className="peer sr-only" />
-                  <Label
-                    htmlFor="light"
-                    className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                     <div className="w-full bg-gray-100 p-2 rounded-lg aspect-video flex items-center">
-                        <div className="space-y-2 rounded-sm bg-white p-2 shadow-sm w-full">
-                            <div className="h-2 w-4/5 rounded-lg bg-gray-300" />
-                            <div className="h-2 w-full rounded-lg bg-gray-300" />
-                        </div>
-                     </div>
-                     <span className="block w-full p-2 text-center font-normal">Light</span>
-                  </Label>
-                </div>
-                <div>
-                  <RadioGroupItem value="dark" id="dark" className="peer sr-only" />
-                  <Label
-                    htmlFor="dark"
-                     className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    <div className="w-full bg-gray-900 p-2 rounded-lg aspect-video flex items-center">
-                        <div className="space-y-2 rounded-sm bg-gray-800 p-2 shadow-sm w-full">
-                            <div className="h-2 w-4/5 rounded-lg bg-gray-400" />
-                            <div className="h-2 w-full rounded-lg bg-gray-400" />
-                        </div>
-                     </div>
-                     <span className="block w-full p-2 text-center font-normal">Dark</span>
-                  </Label>
-                </div>
-                <div>
-                  <RadioGroupItem value="system" id="system" className="peer sr-only" />
-                  <Label
-                    htmlFor="system"
-                     className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                  >
-                    <div className="w-full bg-gray-100 dark:bg-gray-900 p-2 rounded-lg aspect-video flex items-center">
-                        <div className="space-y-2 rounded-sm bg-white dark:bg-gray-800 p-2 shadow-sm w-full">
-                            <div className="h-2 w-4/5 rounded-lg bg-gray-300 dark:bg-gray-400" />
-                            <div className="h-2 w-full rounded-lg bg-gray-300 dark:bg-gray-400" />
-                        </div>
-                     </div>
-                     <span className="block w-full p-2 text-center font-normal">System</span>
-                  </Label>
-                </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
-        </TabsContent>
-         <TabsContent value="sharing">
-          <Card>
-            <CardHeader>
-              <CardTitle>Share Public Profile</CardTitle>
-              <CardDescription>
-                Generate a secure, read-only link to your trading dashboard. The link will expire after 10 minutes and can only be used once.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <Button onClick={handleGenerateLink} disabled={isGeneratingLink}>
-                    {isGeneratingLink ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
-                    {isGeneratingLink ? "Generating Link..." : "Generate Secure Link"}
-                 </Button>
+   <main className="flex-1 space-y-4 p-4 sm:p-6 md:p-8">
+  <div className="space-y-2">
+    <h1 className="font-headline text-2xl font-bold tracking-tight md:text-3xl">الإعدادات</h1>
+    <p className="text-muted-foreground">إدارة حسابك، المظهر، والبيانات.</p>
+  </div>
+  <Tabs defaultValue="appearance" className="w-full">
+    <TabsList className="grid w-full max-w-lg grid-cols-4">
+      <TabsTrigger value="profile">الملف الشخصي</TabsTrigger>
+      <TabsTrigger value="appearance">المظهر</TabsTrigger>
+      <TabsTrigger value="sharing">المشاركة</TabsTrigger>
+      <TabsTrigger value="data">البيانات</TabsTrigger>
+    </TabsList>
 
-                {shareableLink && (
-                    <div className="space-y-2 pt-4">
-                        <Label htmlFor="share-link">Your Secure Sharable Link</Label>
-                        <p className="text-sm text-muted-foreground">This link is valid for 10 minutes.</p>
-                        <div className="flex gap-2">
-                            <Input id="share-link" type="text" readOnly value={shareableLink} className="bg-muted"/>
-                            <Button variant="outline" size="icon" onClick={copyToClipboard} aria-label="Copy link">
-                                <Copy className="h-4 w-4"/>
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="data">
-          <Card>
-            <CardHeader>
-              <CardTitle>Data Management</CardTitle>
-              <CardDescription>
-                Manage your application data. Be careful, these actions are irreversible.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border border-destructive/50 p-4">
-                <div className="mb-4 sm:mb-0">
-                  <h3 className="font-semibold text-destructive">Delete All Trades</h3>
-                  <p className="text-sm text-muted-foreground">
-                    This will permanently delete all your trade data from our servers.
-                  </p>
+    <TabsContent value="profile">
+      <Card>
+        <CardHeader>
+          <CardTitle>الملف الشخصي</CardTitle>
+          <CardDescription>هكذا سيراك الآخرون على الموقع.</CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit(onProfileSubmit)}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">الاسم</Label>
+              <Input id="name" {...register("name")} disabled={isSubmitting} />
+              {errors.name && (
+                <p className="text-sm text-destructive">{errors.name.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">البريد الإلكتروني</Label>
+              <Input id="email" value={user?.email || ""} disabled />
+            </div>
+          </CardContent>
+          <CardFooter className="border-t px-6 py-4">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "جارٍ الحفظ..." : "حفظ التغييرات"}
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+    </TabsContent>
+
+    <TabsContent value="appearance">
+      <Card>
+        <CardHeader>
+          <CardTitle>المظهر</CardTitle>
+          <CardDescription>خصص مظهر وشكل التطبيق.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup
+            defaultValue={theme}
+            onValueChange={setTheme}
+            className="grid max-w-md grid-cols-1 gap-8 pt-2 sm:grid-cols-3"
+          >
+            <div>
+              <RadioGroupItem value="light" id="light" className="peer sr-only" />
+              <Label
+                htmlFor="light"
+                className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              >
+                <div className="w-full bg-gray-100 p-2 rounded-lg aspect-video flex items-center">
+                  <div className="space-y-2 rounded-sm bg-white p-2 shadow-sm w-full">
+                    <div className="h-2 w-4/5 rounded-lg bg-gray-300" />
+                    <div className="h-2 w-full rounded-lg bg-gray-300" />
+                  </div>
                 </div>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="w-full sm:w-auto">Delete All Data</Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete all your trades.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeleteAllTrades} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                        Yes, delete all trades
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <span className="block w-full p-2 text-center font-normal">فاتح</span>
+              </Label>
+            </div>
+            <div>
+              <RadioGroupItem value="dark" id="dark" className="peer sr-only" />
+              <Label
+                htmlFor="dark"
+                className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              >
+                <div className="w-full bg-gray-900 p-2 rounded-lg aspect-video flex items-center">
+                  <div className="space-y-2 rounded-sm bg-gray-800 p-2 shadow-sm w-full">
+                    <div className="h-2 w-4/5 rounded-lg bg-gray-400" />
+                    <div className="h-2 w-full rounded-lg bg-gray-400" />
+                  </div>
+                </div>
+                <span className="block w-full p-2 text-center font-normal">غامق</span>
+              </Label>
+            </div>
+            <div>
+              <RadioGroupItem value="system" id="system" className="peer sr-only" />
+              <Label
+                htmlFor="system"
+                className="flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-background p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              >
+                <div className="w-full bg-gray-100 dark:bg-gray-900 p-2 rounded-lg aspect-video flex items-center">
+                  <div className="space-y-2 rounded-sm bg-white dark:bg-gray-800 p-2 shadow-sm w-full">
+                    <div className="h-2 w-4/5 rounded-lg bg-gray-300 dark:bg-gray-400" />
+                    <div className="h-2 w-full rounded-lg bg-gray-300 dark:bg-gray-400" />
+                  </div>
+                </div>
+                <span className="block w-full p-2 text-center font-normal">النظام</span>
+              </Label>
+            </div>
+          </RadioGroup>
+        </CardContent>
+      </Card>
+    </TabsContent>
+
+    <TabsContent value="sharing">
+      <Card>
+        <CardHeader>
+          <CardTitle>مشاركة الملف العام</CardTitle>
+          <CardDescription>
+            أنشئ رابطًا آمنًا للقراءة فقط إلى لوحة تداولك. الرابط صالح لمدة 10 دقائق ويمكن استخدامه مرة واحدة فقط.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button onClick={handleGenerateLink} disabled={isGeneratingLink}>
+            {isGeneratingLink ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
+            {isGeneratingLink ? "جاري إنشاء الرابط..." : "إنشاء رابط آمن"}
+          </Button>
+
+          {shareableLink && (
+            <div className="space-y-2 pt-4">
+              <Label htmlFor="share-link">رابط المشاركة الآمن الخاص بك</Label>
+              <p className="text-sm text-muted-foreground">هذا الرابط صالح لمدة 10 دقائق.</p>
+              <div className="flex gap-2">
+                <Input id="share-link" type="text" readOnly value={shareableLink} className="bg-muted" />
+                <Button variant="outline" size="icon" onClick={copyToClipboard} aria-label="نسخ الرابط">
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </main>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </TabsContent>
+
+    <TabsContent value="data">
+      <Card>
+        <CardHeader>
+          <CardTitle>إدارة البيانات</CardTitle>
+          <CardDescription>
+            إدارة بيانات التطبيق الخاص بك. كن حذرًا، هذه العمليات لا يمكن التراجع عنها.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-lg border border-destructive/50 p-4">
+            <div className="mb-4 sm:mb-0">
+              <h3 className="font-semibold text-destructive">حذف جميع التداولات</h3>
+              <p className="text-sm text-muted-foreground">
+                هذا سيحذف نهائيًا جميع بيانات التداول الخاصة بك من خوادمنا.
+              </p>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" className="w-full sm:w-auto">حذف كل البيانات</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>هل أنت متأكد تمامًا؟</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    لا يمكن التراجع عن هذا الإجراء. سيتم حذف جميع تداولاتك نهائيًا.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteAllTrades} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    نعم، احذف جميع التداولات
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </CardContent>
+      </Card>
+    </TabsContent>
+  </Tabs>
+</main>
+
   );
 }
