@@ -3,5 +3,6 @@ export const authorizedUsers = [
   'mouaadidoufkir2@gmail.com',
   'mouaadidoufkir07@gmail.com',
   'darktrader161@gmail.com',
-  'sarah.lachar9865@gmail.com'
+  'sarah.lachar9865@gmail.com',
+  'sltan.ahmed161@gmail.com'
 ];
